@@ -3,20 +3,36 @@
   --surface: rgba(255, 255, 255, 0.04);
   --surface-hover: rgba(255, 255, 255, 0.08);
   --text: #f0f0f5;
-  --text-muted: rgba(255, 255, 255, 0.5);
-  --focus-ring: rgba(255, 255, 255, 0.8);
+  --text-muted: rgba(255, 255, 255, 0.58);
+  --focus-ring: rgba(255, 255, 255, 0.85);
   --glow: rgba(120, 120, 255, 0.15);
-}
 
-/* 🔑 Global scale knob */
-html {
-  font-size: 28px; /* tweak between 20–26 depending on your TV */
+  /* Main tuning knobs */
+  --page-pad: 3rem;
+  --grid-gap: 6rem;
+
+  --tile-width: 28rem;
+  --tile-min-height: 28rem;
+  --tile-pad-y: 1.4rem;
+  --tile-pad-x: 2rem;
+  --tile-radius: 1.5rem;
+
+  --tile-gap: 3rem;
+  --icon-size: 18rem;
+  --label-size: 4rem;
+  --clock-size: 10rem;
+
+  --focus-scale: 1.04;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html {
+  font-size: 16px;
 }
 
 body {
@@ -36,74 +52,76 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 4rem;
+  padding: var(--page-pad);
 }
 
-/* Clock */
 .clock {
   position: fixed;
   top: 2rem;
   right: 3rem;
-  font-size: 1rem;
-  font-weight: 400;
+  font-size: var(--clock-size);
+  font-weight: 600;
   color: var(--text-muted);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0.1rem 0.5rem rgba(0, 0, 0, 0.35);
 }
 
-/* Grid */
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 14rem);
-  gap: 2.5rem;
+  grid-template-columns: repeat(auto-fit, var(--tile-width));
+  gap: var(--grid-gap);
   justify-content: center;
+  align-content: center;
+  width: 100%;
 }
 
-@media (max-width: 900px) {
-  .grid { grid-template-columns: repeat(2, 12rem); }
-}
-
-@media (max-width: 600px) {
-  .grid { grid-template-columns: 12rem; }
-}
-
-/* Tiles */
 .tile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  padding: 2.5rem 1.5rem 2rem;
-  border-radius: 2rem;
+  justify-content: center;
+  gap: var(--tile-gap);
+
+  min-height: var(--tile-min-height);
+  padding: var(--tile-pad-y) var(--tile-pad-x);
+
+  border-radius: var(--tile-radius);
   background: var(--surface);
   backdrop-filter: blur(1rem);
   -webkit-backdrop-filter: blur(1rem);
   border: 0.05rem solid rgba(255, 255, 255, 0.06);
+
   color: var(--text);
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   outline: none;
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .tile:hover,
 .tile:focus {
   background: var(--surface-hover);
-  transform: scale(1.08);
-  border-color: rgba(255, 255, 255, 0.12);
+  transform: scale(var(--focus-scale)) translateX(0.2rem);
+  border-color: rgba(255, 255, 255, 0.14);
   box-shadow:
-    0 0 0 0.1rem var(--focus-ring),
+    0 0 0 0.18rem var(--focus-ring),
     0 1rem 3rem rgba(0, 0, 0, 0.4),
     0 0 4rem var(--glow);
 }
 
 .tile:active {
-  transform: scale(1.02);
-  transition-duration: 0.1s;
+  transform: scale(1.01);
+  transition-duration: 0.08s;
 }
 
-/* Icon */
 .tile-icon {
-  width: 5rem;
-  height: 5rem;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex: 0 0 var(--icon-size);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,15 +130,12 @@ body {
 .tile-icon svg {
   width: 100%;
   height: 100%;
+  display: block;
 }
 
-/* Label */
 .tile-label {
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--text-muted);
-  transition: color 0.3s ease;
+
+  display: none;
 }
 
 .tile:hover .tile-label,
