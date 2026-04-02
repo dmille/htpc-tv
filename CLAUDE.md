@@ -42,11 +42,24 @@ state/                # Gitignored runtime state; only .gitkeep tracked
 - `make uninstall` - Remove launcher and autostart entry
 - `make clean` - Remove `.tmp/` directory
 
+## Development principles
+
+### This repo is the single source of truth
+
+All configuration, scripts, and web assets live in this repo. Nothing is hand-edited on the target machine. Changes are always made here first, then deployed via Make targets. If something needs to change on the target system, the corresponding script or config in this repo must be updated -- never patch the deployed files directly.
+
+### Scripts must be idempotent
+
+Every script must be safe to run repeatedly. Check before installing (e.g. `command -v` before apt install), use `rsync --delete` instead of manual copies, overwrite config files rather than appending. `make bootstrap` should be runnable on a fresh machine or an already-configured one with the same result.
+
+### Keep deploy scripts in sync with changes
+
+When adding new features (new packages, new config, new web assets), update the relevant install script AND the doctor script. If a new component is added, `doctor.sh` should validate it. The deploy pipeline is: edit in repo -> `make <target>` -> deployed to target paths. Don't add things that bypass this flow.
+
 ## Conventions
 
 - All scripts use `set -euo pipefail` and are invoked via `bash scripts/<name>.sh`
 - Scripts receive config via environment variables set in the Makefile (INSTALL_DIR, AUTOSTART_DIR, etc.)
-- Scripts are idempotent where possible (check before install)
 - No build step for the web frontend -- plain HTML/CSS/JS, no bundler or framework
 - The launcher runs as a local `file://` URL, not a web server
 
