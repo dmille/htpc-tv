@@ -17,6 +17,47 @@
   let detailItem = null;
   let detailTorrent = null;
 
+  // Rating icons
+  // RT Fresh tomato (from rottentomatoes.com production bundle)
+  const ICON_RT_FRESH = '<svg class="rating-icon" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g transform="translate(10.1,0)"><mask id="rtf" fill="#fff"><polygon points="0 0.12 59.6 0.12 59.6 80 0 80"/></mask><path d="M2.53 19.1c.23 4.9 12.36 8.78 27.27 8.69 13.02-.07 23.89-3.15 26.55-7.19a4.3 4.3 0 0 0-2.39-.73c.01-.12.02-.24.01-.36a3.26 3.26 0 0 0-3.28-3.83c.05-.25.07-.51.07-.78a3.93 3.93 0 0 0-3.93-3.88h-.14c.14-.4.22-.83.21-1.28A3.93 3.93 0 0 0 43 5.34c-.5 0-.97.1-1.4.27A3.94 3.94 0 0 0 38.4 3.54c-.24-1.94-1.89-3.43-3.9-3.42-1.26.01-2.37.61-3.08 1.54a3.92 3.92 0 0 0-2.9-.27c-.44.17-.82.42-1.16.66A3.94 3.94 0 0 0 18.83 3.88c-1.69.01-3.13 1.1-3.66 2.61a4.32 4.32 0 0 0-2.43 3.64c0 .37.06.72.15 1.05-.48-.21-1.02-.33-1.59-.33A3.94 3.94 0 0 0 7.64 13.48c-.51-.23-1.07-.37-1.67-.36a3.94 3.94 0 0 0-3.9 3.92c0 .71.2 1.38.53 1.95l-.1.1" fill="#F9D320" mask="url(#rtf)"/><path d="M50.97 68.16c-1.15 1.74-3.37 3.54-5.7 4.74l3.98-40.42a53 53 0 0 0 6.84-3.44l-5.11 39.11zm-9.67 6.43c-3.86 1.28-6.1 1.67-9.31 1.99l.5-41.53c3.55-.1 8.14-.58 12.05-1.42l-3.24 40.96zm-23-6.43l-3.24-40.97c3.91.84 8.5 1.32 12.05 1.42l.5 41.53c-3.21-.31-5.45-.71-9.31-1.99zm-9.67-6.43L3.52 29.04c1.82 1.55 4.3 2.63 6.83 3.44l3.99 40.42c-2.33-1.2-4.56-3-5.7-4.74zM50.69 13.61c.05.25.08.5.08.76 0 .27-.03.53-.07.77a3.26 3.26 0 0 1 3.28 3.83c.01.12.01.24.01.36.94.13 1.78.59 2.39 1.26-2.66 4.04-13.53 7.12-26.55 7.19C15.89 27.88 2.76 24 2.53 19.1l.1-.11a4.1 4.1 0 0 1-.47-1.3C.73 19.05-.13 20.14.02 21.74l6.32 45.33c.73 7.15 11.1 12.86 23.47 12.93 12.36-.07 22.74-5.78 23.47-12.93l6.3-45.33c.3-3.18-3.42-6.07-8.9-8.12z" fill="#DB382A" mask="url(#rtf)"/></g><path d="M25.16 33.63l3.24 40.96c3.86 1.28 6.1 1.67 9.31 1.99l-.5-41.53c-3.55-.1-8.14-.58-12.05-1.42" fill="#FFFFFE"/><path d="M42.09 76.58c3.21-.32 5.45-.71 9.31-1.99l3.24-40.96c-3.91.84-8.5 1.32-12.05 1.42l-.5 41.53" fill="#FFFFFE"/><path d="M55.37 72.9c2.33-1.2 4.56-3 5.7-4.74l5.11-39.11c-1.82 1.55-4.3 2.63-6.83 3.44L55.37 72.9" fill="#FFFFFE"/><path d="M13.62 29.04l-5.11 39.11c1.15 1.74 3.37 3.54 5.7 4.74l-3.98-40.42c-2.54-.81-5.02-1.89-6.83-3.44l10.23.01" fill="#FFFFFE"/></svg>';
+  // RT Rotten splat (from rottentomatoes.com production bundle)
+  const ICON_RT_ROTTEN = '<svg class="rating-icon" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0,12.46)"><path d="M45.48 39.62c.47-1.17 2.15-1.88 3.35-1.8 1.29.09 2.65 1.44 2.89 2.77l.14-.14c.41-.39.93-.66 1.5-.73-.09-.38-.11-.8-.05-1.22a2.82 2.82 0 0 1 2.76-2.58c.88.01 1.65.46 2.15 1.15l.14-.16c.58-2.99.94-6.37 1.02-9.96.28-12.34-2.85-22.41-6.99-22.51-4.15-.1-7.74 9.82-8.02 22.16 0 0-.22 4.5 1.11 13.02" fill="#185A30"/><path d="M73.54 53.11a2.46 2.46 0 0 0 .37-1.42c.08-1.68-1.08-3.21-2.68-3.04.05-.19.08-.39.09-.6a3.09 3.09 0 0 0-2.6-3.25h-.1c.16-.42.24-.89.21-1.38a2.82 2.82 0 0 0-2.3-2.82 2.51 2.51 0 0 0-1.3.1 2.57 2.57 0 0 0-2.16-1.78c-.08-1.53-1.18-2.78-2.6-2.88-.89-.06-1.71.35-2.26 1.03a2.82 2.82 0 0 0-2.15-1.15 2.82 2.82 0 0 0-2.76 2.58c-.06.42-.04.83.05 1.22-.57.07-1.09.33-1.5.73l-.14.14c-.24-1.33-1.6-2.68-2.89-2.77-1.2-.08-2.88.65-3.35 1.8.2 2.01 1.46 7.49 6 12.41h.04a2.82 2.82 0 0 0 1.62.56c.38-.03.73-.17 1.03-.38l.07.01c.4.28.88.42 1.39.38.19-.02.38-.06.56-.13a2.82 2.82 0 0 0 2.49 1.39c.84-.07 1.55-.61 1.97-1.26l.14.01a2.1 2.1 0 0 0 1.58.64c.5.75 1.41 1.21 2.42 1.12.38-.03.73-.14 1.05-.31a2.82 2.82 0 0 0 2.34.95 2.82 2.82 0 0 0 2.16-1.32c.42.34.95.52 1.52.47a2.2 2.2 0 0 0 1.4-.7l.06.01.22-.37.01-.01.03-.02" fill="#F9D320"/><path d="M42.21 9.21L6.56 12.73c1.06-2.06 2.65-4.02 4.19-5.03l34.5-4.51c-1.37 1.61-2.32 3.79-3.04 6.03zm3.04 40.34L10.75 45.04c-1.54-1.01-3.13-2.97-4.19-5.03l35.65 3.51c.72 2.24 1.67 4.42 3.04 6.03zM5.08 36.51C3.95 33.11 3.6 31.13 3.32 28.3l36.63.44c.09 3.13.52 7.18 1.25 10.63L5.08 36.51zm0-20.29l36.13-2.86c-.74 3.45-1.16 7.5-1.25 10.63l-36.63.44C3.6 21.61 3.95 19.63 5.08 16.22zM56.72 3.85C54.43 1.19 52.79-.06 51.39.1L11.4 5.67C5.1 6.31.06 15.47 0 26.37c.06 10.9 5.1 20.06 11.4 20.7l39.98 5.56c.33 0 .66-.04.99-.13-.31-.09-.6-.26-.85-.48h-.04c-4.55-4.92-5.8-10.4-6-12.41 0 0 0 0 0 0-1.33-8.51-1.11-13.01-1.11-13.01.28-12.34 3.88-22.26 8.02-22.16 4.15.1 7.27 10.17 6.99 22.51-.08 3.59-.45 6.97-1.02 9.96.59-.65 1.38-.93 2.12-.88.14.01.27.03.4.06 2.52-13.78-.11-27.23-4.14-32.25z" fill="#129B47"/></g><path d="M41.2 25.83L5.08 28.69c-1.13-3.4-1.48-5.38-1.76-8.21l36.63-.44c.09 3.13.52 7.18 1.25 10.63l.01-.84" fill="#FFFFFE"/><path d="M45.24 15.65L10.75 20.16c-1.54-1.01-3.13-2.97-4.19-5.03l35.65-3.51c.72 2.24 1.67 4.42 3.04 6.03" fill="#FFFFFE"/><path d="M6.56 52.47c1.06 2.06 2.65 4.02 4.19 5.03l34.5 4.51c-1.37-1.61-2.32-3.79-3.04-6.03L6.56 52.47" fill="#FFFFFE"/><path d="M39.95 40.93L3.32 40.5c.28 2.83.63 4.81 1.76 8.21l36.13 2.86c-.74-3.45-1.16-7.5-1.25-10.63" fill="#FFFFFE"/></svg>';
+  // IMDb (Simple Icons, CC0)
+  const ICON_IMDB = '<svg class="rating-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.38 0H1.62C.74.06.06.74 0 1.6v20.78c.06.88.71 1.54 1.56 1.62h20.88c.87-.08 1.56-.83 1.56-1.71V1.71c0-.89-.7-1.64-1.58-1.71zM22.38.5c.6.05 1.07.52 1.13 1.21v20.58c0 .64-.49 1.16-1.1 1.21H1.6c-.6-.05-1.06-.53-1.1-1.13V1.63C.54 1.02 1.02.54 1.62.5h20.76zM4.8 8.26v7.36H2.89V8.26H4.8zm6.54 0v7.36H9.67v-4.97l-.67 4.97H7.81l-.7-4.86-.01 4.86H5.44V8.26h2.47l.5 3.45.44-3.45h2.48zm2.98 1.33c.07.04.12.11.14.2.03.1.03.31.03.65v2.85c0 .49-.03.79-.1.9-.06.11-.23.17-.5.17V9.52c.2 0 .35.02.42.07zm-.02 6.03c.45 0 .8-.03 1.02-.07.23-.05.42-.14.57-.26.16-.12.26-.3.33-.52.06-.22.1-.66.1-1.32v-2.58c0-.7-.03-1.17-.07-1.4-.04-.24-.14-.46-.31-.65-.17-.2-.42-.33-.75-.42-.32-.08-.85-.13-1.77-.13h-1.42v7.36h2.3zm5.14-1.78c0 .35-.02.58-.05.67-.03.09-.19.14-.3.14-.11 0-.19-.05-.23-.14-.04-.09-.06-.3-.06-.62v-1.95c0-.33.02-.54.05-.62.03-.08.11-.12.22-.12.12 0 .27.04.31.14.04.09.06.3.06.6v1.9zm-2.47-5.58v7.36h1.72l.12-.47c.16.19.33.33.52.43.18.09.46.14.68.14.3 0 .56-.07.78-.24.22-.16.36-.35.42-.56.05-.22.09-.54.09-.98v-2.07c0-.44-.01-.73-.03-.87-.02-.14-.07-.28-.17-.42-.1-.14-.24-.25-.43-.33-.18-.07-.4-.12-.66-.12-.22 0-.5.05-.68.13-.18.09-.35.22-.51.4V8.26h-1.83z"/></svg>';
+  // TMDB (Simple Icons, CC0)
+  const ICON_TMDB = '<svg class="rating-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.62 12a2.29 2.29 0 0 1 2.29-2.3h-.01a2.29 2.29 0 0 1 2.29 2.3 2.29 2.29 0 0 1-2.29 2.29h.01A2.29 2.29 0 0 1 6.62 12zm10.72-4.06h4.27a2.29 2.29 0 0 0 2.29-2.29 2.29 2.29 0 0 0-2.29-2.3h-4.27a2.29 2.29 0 0 0-2.29 2.3 2.29 2.29 0 0 0 2.29 2.29zM2.69 20.65h8.28a2.29 2.29 0 0 0 2.29-2.29 2.29 2.29 0 0 0-2.29-2.3H2.69a2.29 2.29 0 0 0-2.29 2.3 2.29 2.29 0 0 0 2.29 2.29z"/></svg>';
+
+  function rtIcon(score) {
+    return score >= 60 ? ICON_RT_FRESH : ICON_RT_ROTTEN;
+  }
+
+  function ratingPillsHtml(ratings, tmdbRating) {
+    const pills = [];
+    if (ratings && ratings.rt) {
+      const cls = ratings.rt >= 60 ? 'fresh' : 'rotten';
+      pills.push(`<span class="rating-pill rating-pill-rt ${cls}">${rtIcon(ratings.rt)} ${ratings.rt}%</span>`);
+    }
+    if (ratings && ratings.imdb) {
+      pills.push(`<span class="rating-pill rating-pill-imdb">${ICON_IMDB} ${ratings.imdb}</span>`);
+    }
+    if (tmdbRating) {
+      pills.push(`<span class="rating-pill rating-pill-tmdb">${ICON_TMDB} ${tmdbRating.toFixed(1)}</span>`);
+    }
+    return pills.join('');
+  }
+
+  function posterRatingHtml(ratings, tmdbRating) {
+    const parts = [];
+    if (ratings && ratings.rt) {
+      const cls = ratings.rt >= 60 ? 'fresh' : 'rotten';
+      parts.push(`<span class="poster-rating poster-rating-rt ${cls}">${rtIcon(ratings.rt)} ${ratings.rt}%</span>`);
+    }
+    if (ratings && ratings.imdb) {
+      parts.push(`<span class="poster-rating poster-rating-imdb">${ICON_IMDB} ${ratings.imdb}</span>`);
+    }
+    return parts.join('');
+  }
+
   // Elements
   const navBar = document.getElementById('navBar');
   const navTabs = navBar.querySelectorAll('.nav-tab');
@@ -54,6 +95,7 @@
     discoverView.classList.toggle('active', view === 'discover');
 
     stopPolling();
+    history.replaceState(null, '', `/${view === 'search' ? '' : view}`);
     if (view === 'search') {
       searchInput.focus();
       discoverBackdrop.classList.remove('visible');
@@ -316,11 +358,13 @@
     discoverRows.innerHTML = discoverData.map((row, rowIdx) => {
       const postersHtml = row.items.map((item, colIdx) => {
         const poster = item.poster || '';
+        const ratingsHtml = posterRatingHtml(item.ratings, item.tmdbRating);
         return `
           <div class="poster-card" tabindex="0" data-row="${rowIdx}" data-col="${colIdx}">
             <img src="${poster}" alt="${escapeHtml(item.title)}" loading="lazy">
             <div class="poster-card-title">${escapeHtml(item.title)}</div>
             <div class="poster-card-year">${item.year || ''}</div>
+            ${ratingsHtml ? `<div class="poster-ratings">${ratingsHtml}</div>` : ''}
           </div>
         `;
       }).join('');
@@ -427,30 +471,19 @@
     detailOverview.textContent = detailItem.overview || '';
 
     // Ratings
-    const pills = [];
-    const ratings = detailItem.ratings || {};
-    if (ratings.rt) {
-      const freshClass = ratings.rt >= 75 ? 'fresh' : '';
-      pills.push(`<span class="rating-pill rating-pill-rt ${freshClass}">${ratings.rt}%</span>`);
-    }
-    if (ratings.imdb) {
-      pills.push(`<span class="rating-pill rating-pill-imdb">${ratings.imdb}</span>`);
-    }
-    if (detailItem.tmdbRating) {
-      pills.push(`<span class="rating-pill rating-pill-tmdb">${detailItem.tmdbRating.toFixed(1)}</span>`);
-    }
-    detailRatings.innerHTML = pills.join('');
+    detailRatings.innerHTML = ratingPillsHtml(detailItem.ratings, detailItem.tmdbRating);
 
     // Backdrop
     if (detailItem.backdrop) {
       detailBackdrop.style.backgroundImage = `url(${detailItem.backdrop})`;
     }
 
-    // Reset torrent section
-    detailTorrentEl.innerHTML = '<div class="detail-torrent-loading">Searching for best torrent...</div>';
-    detailDownloadBtn.classList.add('hidden');
-    detailDownloadBtn.classList.remove('downloading', 'success');
-    detailDownloadBtn.textContent = 'Download';
+    // Show button immediately in searching state
+    detailTorrentEl.innerHTML = '';
+    detailDownloadBtn.classList.remove('hidden', 'success');
+    detailDownloadBtn.classList.add('searching');
+    detailDownloadBtn.textContent = 'Finding torrent...';
+    detailDownloadBtn.disabled = true;
     detailUnavailable.classList.add('hidden');
 
     // Show panel
@@ -459,7 +492,9 @@
 
     // Search for torrent
     try {
-      const res = await fetch(`/api/discover/item/${detailItem.tmdbId}?type=${detailItem.mediaType}`);
+      const url = `/api/discover/item/${detailItem.tmdbId}?type=${detailItem.mediaType}`;
+      console.log('[detail] Fetching torrent:', url);
+      const res = await fetch(url);
       if (!res.ok) throw new Error('Search failed');
       const data = await res.json();
 
@@ -472,14 +507,21 @@
             <span style="color: var(--text-muted)">${data.torrent.seeders} seeds</span>
           </div>
         `;
-        detailDownloadBtn.classList.remove('hidden');
+        detailDownloadBtn.classList.remove('searching');
+        detailDownloadBtn.disabled = false;
+        detailDownloadBtn.textContent = 'Download';
         detailDownloadBtn.focus();
       } else {
-        detailTorrentEl.innerHTML = '';
+        detailDownloadBtn.classList.remove('searching');
+        detailDownloadBtn.classList.add('hidden');
+        detailDownloadBtn.disabled = true;
         detailUnavailable.classList.remove('hidden');
       }
     } catch (err) {
-      detailTorrentEl.innerHTML = '';
+      console.error('[detail] Torrent search failed:', err);
+      detailDownloadBtn.classList.remove('searching');
+      detailDownloadBtn.classList.add('hidden');
+      detailDownloadBtn.disabled = true;
       detailUnavailable.classList.remove('hidden');
     }
   }
@@ -495,10 +537,15 @@
     focusDiscoverPoster(discoverFocusRow, discoverFocusCol);
   }
 
-  async function downloadFromDetail() {
-    if (!detailTorrent || !detailItem) return;
+  let downloadInProgress = false;
 
-    detailDownloadBtn.textContent = 'Downloading...';
+  async function downloadFromDetail() {
+    if (!detailTorrent || !detailItem || downloadInProgress) return;
+    if (detailDownloadBtn.disabled) return;
+
+    downloadInProgress = true;
+    detailDownloadBtn.disabled = true;
+    detailDownloadBtn.textContent = 'Submitting...';
     detailDownloadBtn.classList.add('downloading');
 
     try {
@@ -519,7 +566,7 @@
 
       if (!res.ok) throw new Error('Download failed');
 
-      detailDownloadBtn.textContent = 'Added';
+      detailDownloadBtn.textContent = 'Added!';
       detailDownloadBtn.classList.remove('downloading');
       detailDownloadBtn.classList.add('success');
 
@@ -527,15 +574,19 @@
       const card = discoverRows.querySelector(`.poster-card[data-row="${discoverFocusRow}"][data-col="${discoverFocusCol}"]`);
       if (card) card.classList.add('downloaded');
 
-      // Auto-dismiss after 2s
-      setTimeout(closeDetailPanel, 2000);
+      // Auto-dismiss after 1.5s
+      setTimeout(closeDetailPanel, 1500);
     } catch (err) {
-      detailDownloadBtn.textContent = 'Failed - Try Again';
+      detailDownloadBtn.textContent = 'Failed — Tap to Retry';
       detailDownloadBtn.classList.remove('downloading');
+      detailDownloadBtn.disabled = false;
     }
+
+    downloadInProgress = false;
   }
 
   detailDownloadBtn.addEventListener('click', downloadFromDetail);
+  document.getElementById('detailCloseBtn').addEventListener('click', closeDetailPanel);
 
   // ===== KEYBOARD NAVIGATION =====
 
@@ -699,5 +750,11 @@
   }
 
   // --- Init ---
-  searchInput.focus();
+  const initPath = location.pathname.replace(/^\//, '') || 'search';
+  const initView = ['discover', 'downloads'].includes(initPath) ? initPath : 'search';
+  if (initView !== 'search') {
+    switchView(initView);
+  } else {
+    searchInput.focus();
+  }
 })();

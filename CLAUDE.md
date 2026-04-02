@@ -105,6 +105,14 @@ Everything is larger than desktop/mobile. The launcher's CSS variables are the r
 - **No hover-only states**: hover effects must also apply on `:focus`. Remote/keyboard users never hover.
 - **Cursor hidden**: TV mode hides the cursor (`cursor: none` on body). Don't rely on pointer interactions.
 
+### Feedback
+
+- **Every interaction must produce immediate visible feedback.** No silent failures, no delayed responses with no indicator. If the user taps/clicks/presses Enter and nothing visibly changes within 100ms, that's a bug.
+- **Button states**: idle → active (press/tap visual) → loading (animated text or spinner) → success/failure. Never skip straight from idle to a distant future state.
+- **Async operations**: show a loading state the instant the action is triggered, not when the network call starts. The button itself should change (text, color, animation) immediately.
+- **Errors**: always show what went wrong and offer a retry. Never leave the user in a dead state.
+- **Mobile**: `:active` pseudo-class for tap feedback (scale down, color shift). Buttons must respond visually to touch even before the action completes.
+
 ### Navigation model
 
 - **D-pad is primary**: Up/Down to move through lists, Left/Right for tabs/toggles, Enter to select.

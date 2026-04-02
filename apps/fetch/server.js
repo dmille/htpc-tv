@@ -13,6 +13,11 @@ const PORT = process.env.FETCH_PORT || 8881;
 app.use(express.json({ limit: '10kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// SPA fallback: serve index.html for view paths
+app.get('/discover', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/downloads', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/search', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+
 // Search TPB
 app.get('/api/search', async (req, res) => {
   const { q, cat } = req.query;
@@ -176,6 +181,7 @@ app.get('/api/discover', (req, res) => {
 app.get('/api/discover/item/:tmdbId', async (req, res) => {
   const { tmdbId } = req.params;
   const { type } = req.query; // 'movie' or 'tv'
+  console.log(`[discover/item] Looking up tmdbId=${tmdbId} type=${type}`);
 
   try {
     // Look up item on TMDB to get title + year
@@ -188,7 +194,9 @@ app.get('/api/discover/item/:tmdbId', async (req, res) => {
     const item = await tmdbRes.json();
     const title = item.title || item.name;
     const year = (item.release_date || item.first_air_date || '').substring(0, 4);
-    const query = year ? `${title} ${year}` : title;
+    // Strip special characters that break Apibay search (apostrophes, colons, etc.)
+    const cleanTitle = title.replace(/[''":!,]/g, '').replace(/\s+/g, ' ').trim();
+    const query = year ? `${cleanTitle} ${year}` : cleanTitle;
 
     // Search for torrents using existing pipeline
     const cat = type === 'tv' ? 208 : 207;
