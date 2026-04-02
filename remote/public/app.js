@@ -178,5 +178,51 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// --- Idle blink ---
+
+function scheduleBlink() {
+  const delay = 2000 + Math.random() * 4000; // 2-6s between blinks
+  setTimeout(() => {
+    // Only blink when idle (no mood animation playing)
+    if (moteEl.classList.length === 1) {
+      moteEl.classList.add('blink');
+      // Occasional double-blink
+      const double = Math.random() < 0.3;
+      const reopenDelay = double ? 250 : 120;
+      setTimeout(() => {
+        moteEl.classList.remove('blink');
+        if (double) {
+          setTimeout(() => {
+            moteEl.classList.add('blink');
+            setTimeout(() => moteEl.classList.remove('blink'), 120);
+          }, 100);
+        }
+      }, reopenDelay);
+    }
+    scheduleBlink();
+  }, delay);
+}
+
+scheduleBlink();
+
+// --- Idle mouth expressions ---
+
+const IDLE_MOUTHS = ['idle-smile', 'idle-oo', 'idle-smirk', 'idle-tongue'];
+
+function scheduleMouth() {
+  const delay = 8000 + Math.random() * 12000; // 8-20s between expressions
+  setTimeout(() => {
+    if (moteEl.classList.length === 1) {
+      const expr = IDLE_MOUTHS[Math.floor(Math.random() * IDLE_MOUTHS.length)];
+      moteEl.classList.add(expr);
+      const duration = 1000 + Math.random() * 800; // hold for 1-1.8s
+      setTimeout(() => moteEl.classList.remove(expr), duration);
+    }
+    scheduleMouth();
+  }, delay);
+}
+
+scheduleMouth();
+
 // --- Initial mood ---
 setMote('happy', 'Hi! I\'m Mote!');

@@ -1,6 +1,7 @@
 const express = require('express');
 const { execFile } = require('child_process');
 const path = require('path');
+const { WebSocketServer } = require('ws');
 
 const app = express();
 const PORT = process.env.MOTE_PORT || 8880;
