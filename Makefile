@@ -7,7 +7,7 @@ AUTOSTART_DIR := $(HOME)/.config/autostart
 AUTOSTART_FILE := $(AUTOSTART_DIR)/tv-mode.desktop
 LAUNCHER_URL := file://$(INSTALL_DIR)/index.html
 CHROME_CMD := google-chrome
-CHROME_FLAGS := --start-fullscreen --new-window
+CHROME_FLAGS := --kiosk
 
 .PHONY: help bootstrap packages chrome configure launcher autostart doctor run clean uninstall
 
