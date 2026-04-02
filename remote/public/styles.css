@@ -385,12 +385,17 @@ body {
 
 /* --- Love --- */
 .mote.love .mote-eye {
-  width: 0.6rem;
-  height: 0.55rem;
-  background: #ff6b9d;
-  border-radius: 50% 50% 50% 0;
-  transform: rotate(-45deg);
-  box-shadow: 0 0 0.4rem rgba(255, 107, 157, 0.4);
+  width: 0.75rem;
+  height: 0.7rem;
+  background: transparent;
+  border-radius: 0;
+  transform: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff6b9d' stroke='none'%3E%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: none;
+  filter: drop-shadow(0 0 0.3rem rgba(255, 107, 157, 0.5));
 }
 
 .mote.love .mote-mouth {
@@ -549,7 +554,6 @@ body {
 .dpad-btn svg {
   width: 1.5rem;
   height: 1.5rem;
-  fill: currentColor;
   opacity: 0.7;
 }
 
@@ -677,7 +681,6 @@ body {
 .action-btn svg {
   width: 1.8rem;
   height: 1.8rem;
-  fill: currentColor;
   opacity: 0.8;
 }
 
@@ -702,9 +705,9 @@ body {
   box-shadow: var(--btn-shadow-active);
 }
 
-.action-btn.back svg  { fill: var(--back-color); }
-.action-btn.home svg  { fill: var(--home-color); }
-.action-btn.reload svg { fill: var(--reload-color); }
+.action-btn.back svg  { stroke: var(--back-color); }
+.action-btn.home svg  { stroke: var(--home-color); }
+.action-btn.reload svg { stroke: var(--reload-color); }
 
 /* --- Volume controls --- */
 
@@ -736,7 +739,6 @@ body {
 .volume-btn svg {
   width: 1.6rem;
   height: 1.6rem;
-  fill: currentColor;
   opacity: 0.7;
 }
 
@@ -758,7 +760,7 @@ body {
 .volume-btn.mute svg {
   width: 1.4rem;
   height: 1.4rem;
-  fill: var(--back-color);
+  stroke: var(--back-color);
 }
 
 /* --- Keyboard toggle --- */
