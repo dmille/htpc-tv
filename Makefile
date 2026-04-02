@@ -7,9 +7,11 @@ AUTOSTART_DIR := $(HOME)/.config/autostart
 AUTOSTART_FILE := $(AUTOSTART_DIR)/tv-mode.desktop
 LAUNCHER_URL := file://$(INSTALL_DIR)/index.html
 CHROME_CMD := google-chrome
-CHROME_FLAGS := --kiosk
+CHROME_FLAGS := --kiosk --homepage=$(LAUNCHER_URL)
+REMOTE_DIR := $(CURDIR)/remote
+MOTE_PORT := 8880
 
-.PHONY: help bootstrap packages chrome configure launcher autostart doctor run clean uninstall
+.PHONY: help bootstrap packages chrome configure launcher autostart doctor run clean uninstall remote remote-install remote-service
 
 help:
 	@echo "Targets:"
@@ -21,6 +23,9 @@ help:
 	@echo "  make autostart   - install autostart entry"
 	@echo "  make doctor      - validate system setup"
 	@echo "  make run         - run launcher now"
+	@echo "  make remote-install - install Mote dev remote deps"
+	@echo "  make remote      - start Mote dev remote (port 8880)"
+	@echo "  make remote-service - install Mote as a systemd user service"
 	@echo "  make clean       - remove generated temp files"
 	@echo "  make uninstall   - remove installed repo-managed files"
 
@@ -55,6 +60,15 @@ run:
 	CHROME_CMD="$(CHROME_CMD)" \
 	CHROME_FLAGS="$(CHROME_FLAGS)" \
 	bash scripts/launch-chrome.sh
+
+remote-install:
+	REMOTE_DIR="$(REMOTE_DIR)" bash scripts/install-remote.sh
+
+remote:
+	cd "$(REMOTE_DIR)" && MOTE_PORT="$(MOTE_PORT)" node server.js
+
+remote-service:
+	REMOTE_DIR="$(REMOTE_DIR)" MOTE_PORT="$(MOTE_PORT)" bash scripts/install-remote-service.sh
 
 clean:
 	rm -rf .tmp

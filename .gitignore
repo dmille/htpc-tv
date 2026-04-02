@@ -1,3 +1,4 @@
 .tmp/
 state/*
 !state/.gitkeep
+remote/node_modules/

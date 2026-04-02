@@ -1,0 +1,12 @@
+{
+  "name": "mote-remote",
+  "version": "1.0.0",
+  "description": "Mote - a cute little dev remote for htpc-tv",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

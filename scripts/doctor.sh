@@ -21,6 +21,9 @@ check "Chrome installed" "command -v google-chrome >/dev/null 2>&1"
 check "Launcher installed" "test -f '$INSTALL_DIR/index.html'"
 check "Autostart file exists" "test -f '$AUTOSTART_FILE'"
 check "unclutter installed" "command -v unclutter >/dev/null 2>&1"
+check "Keyring has no password" "test ! -s '${HOME}/.local/share/keyrings/login.keyring'"
 check "Lid close set to ignore" "grep -q '^HandleLidSwitch=ignore' /etc/systemd/logind.conf 2>/dev/null"
+check "Node.js installed" "command -v node >/dev/null 2>&1"
+check "Mote remote deps installed" "test -d '$(dirname "$0")/../remote/node_modules/express'"
 
 exit $fail

@@ -13,6 +13,14 @@ if command -v gsettings >/dev/null 2>&1; then
   gsettings set org.gnome.shell.extensions.dash-to-dock intellihide false || true
 fi
 
+# Disable GNOME Keyring password so it unlocks automatically on auto-login
+KEYRING_DIR="${HOME}/.local/share/keyrings"
+KEYRING_FILE="${KEYRING_DIR}/login.keyring"
+if [[ -f "$KEYRING_FILE" ]] && [[ -s "$KEYRING_FILE" ]]; then
+  rm -f "$KEYRING_FILE"
+  echo "Removed existing login keyring (will be recreated without a password)"
+fi
+
 # Ignore lid close so the laptop doesn't suspend when used as an HTPC
 LOGIND_CONF="/etc/systemd/logind.conf"
 if ! grep -q '^HandleLidSwitch=ignore' "$LOGIND_CONF" 2>/dev/null; then
