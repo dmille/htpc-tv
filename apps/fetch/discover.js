@@ -9,6 +9,14 @@ const JELLYFIN_URL = process.env.JELLYFIN_URL || 'http://titan.local:8096';
 const JELLYFIN_USER = process.env.JELLYFIN_USER || 'jellyfin';
 const JELLYFIN_PASS = process.env.JELLYFIN_PASS || 'jellyfin';
 
+const CRITICS_LISTS = [
+  { id: 28, name: 'Academy Award Best Picture Winners' },
+  { id: 634, name: 'IMDb Top 250' },
+  { id: 8205, name: "Palme d'Or Winners" },
+  { id: 43, name: "AFI's 100 Most Thrilling Films" },
+  { id: 47, name: "Fangoria's 101 Best Horror" },
+];
+
 const GENRE_ROTATION = [
   { id: 878, name: 'Sci-Fi' },
   { id: 53, name: 'Thriller' },
@@ -73,21 +81,30 @@ async function fetchRecentlyAvailable() {
   return data.results.map(r => mapMovie(r));
 }
 
+function randomPage(max) {
+  return Math.floor(Math.random() * max) + 1;
+}
+
 async function fetchHiddenGems() {
+  const page = randomPage(5);
   const [movies, tv] = await Promise.all([
     tmdbGet('/discover/movie', {
       'sort_by': 'vote_average.desc',
       'vote_count.gte': '200',
+      'vote_count.lte': '10000',
       'popularity.gte': '5',
       'popularity.lte': '40',
       'language': 'en-US',
+      'page': page.toString(),
     }),
     tmdbGet('/discover/tv', {
       'sort_by': 'vote_average.desc',
       'vote_count.gte': '200',
+      'vote_count.lte': '10000',
       'popularity.gte': '5',
       'popularity.lte': '40',
       'language': 'en-US',
+      'page': randomPage(5).toString(),
     }),
   ]);
 
@@ -108,9 +125,11 @@ async function fetchGenreGems() {
   const data = await tmdbGet('/discover/movie', {
     'sort_by': 'vote_average.desc',
     'vote_count.gte': '200',
+    'vote_count.lte': '10000',
     'popularity.gte': '5',
     'popularity.lte': '40',
     'with_genres': genre.id.toString(),
+    'page': randomPage(3).toString(),
     'language': 'en-US',
   });
 
@@ -120,8 +139,29 @@ async function fetchGenreGems() {
   };
 }
 
+async function fetchCriticsPicks() {
+  // Pick a random list each refresh
+  const list = CRITICS_LISTS[Math.floor(Math.random() * CRITICS_LISTS.length)];
+
+  const data = await tmdbGet(`/list/${list.id}`, { language: 'en-US' });
+  const items = (data.items || [])
+    .filter(item => item.poster_path) // must have a poster
+    .map(r => mapMovie(r));
+
+  // Shuffle and take 20
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+
+  return {
+    listName: list.name,
+    items: items.slice(0, 20),
+  };
+}
+
 async function fetchTopRated() {
-  const data = await tmdbGet('/movie/top_rated', { language: 'en-US' });
+  const data = await tmdbGet('/movie/top_rated', { language: 'en-US', page: randomPage(5).toString() });
   return data.results.map(r => mapMovie(r));
 }
 
@@ -323,12 +363,13 @@ async function refreshDiscover() {
 
   try {
     // Fetch all rows in parallel
-    const [trending, recent, hiddenGems, genreResult, topRated, recsResult] = await Promise.all([
+    const [trending, recent, hiddenGems, genreResult, topRated, criticsResult, recsResult] = await Promise.all([
       fetchTrending().catch(err => { console.error('[discover] Trending failed:', err.message); return []; }),
       fetchRecentlyAvailable().catch(err => { console.error('[discover] Recent failed:', err.message); return []; }),
       fetchHiddenGems().catch(err => { console.error('[discover] Hidden gems failed:', err.message); return []; }),
       fetchGenreGems().catch(err => { console.error('[discover] Genre gems failed:', err.message); return { genre: '?', items: [] }; }),
       fetchTopRated().catch(err => { console.error('[discover] Top rated failed:', err.message); return []; }),
+      fetchCriticsPicks().catch(err => { console.error('[discover] Critics picks failed:', err.message); return { listName: '?', items: [] }; }),
       fetchRecommendations().catch(err => { console.error('[discover] Recommendations failed:', err.message); return null; }),
     ]);
 
@@ -338,6 +379,7 @@ async function refreshDiscover() {
       { name: 'recent', title: 'Recently Available', items: filterLibrary(recent) },
       { name: 'hidden_gems', title: 'Hidden Gems', items: filterLibrary(hiddenGems) },
       { name: 'genre_gems', title: `Hidden Gems in ${genreResult.genre}`, items: filterLibrary(genreResult.items) },
+      { name: 'critics_picks', title: `Critics' Picks: ${criticsResult.listName}`, items: filterLibrary(criticsResult.items) },
       { name: 'top_rated', title: 'Top Rated', items: filterLibrary(topRated) },
     ];
 
