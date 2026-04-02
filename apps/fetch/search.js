@@ -3,6 +3,9 @@ const db = require('./db');
 const APIBAY_URL = process.env.APIBAY_URL || 'https://apibay.org';
 const MIN_SEEDERS = parseInt(process.env.MIN_SEEDERS || '2', 10);
 
+// Video-only categories (excludes porn 500s, audio 100s, apps 300s, games 400s, other 600s)
+const VIDEO_CATEGORIES = new Set(['201', '202', '205', '207', '208', '209', '210', '211', '212']);
+
 const TRACKERS = [
   'udp://tracker.opentrackr.org:1337/announce',
   'udp://open.stealth.si:80/announce',
@@ -207,7 +210,7 @@ async function search(query, category = 0) {
   // Apibay returns [{id: "0", name: "No results returned"}] when empty
   if (results.length === 1 && results[0].id === '0') return [];
 
-  const parsed = results.map(r => {
+  const parsed = results.filter(r => VIDEO_CATEGORIES.has(r.category)).map(r => {
     const seeders = parseInt(r.seeders);
     const leechers = parseInt(r.leechers);
     const sizeBytes = parseInt(r.size);

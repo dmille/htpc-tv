@@ -4,6 +4,7 @@ const db = require('./db');
 const transmission = require('./transmission');
 const { search } = require('./search');
 const jellyfin = require('./jellyfin');
+const { addPosters } = require('./tmdb');
 
 const app = express();
 const PORT = process.env.FETCH_PORT || 8881;
@@ -18,7 +19,8 @@ app.get('/api/search', async (req, res) => {
 
   try {
     const results = await search(q.trim(), cat || 0);
-    res.json(results);
+    const withPosters = await addPosters(results);
+    res.json(withPosters);
   } catch (err) {
     console.error('[search] Error:', err.message);
     res.status(502).json({ error: 'Search failed' });

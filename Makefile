@@ -19,6 +19,8 @@ JELLYFIN_URL := http://titan.local:8096
 JELLYFIN_USER := jellyfin
 JELLYFIN_PASS := jellyfin
 MIN_SEEDERS := 2
+-include apps/fetch/.env
+export TMDB_TOKEN
 
 .PHONY: help bootstrap packages chrome configure launcher autostart doctor run clean uninstall remote remote-install remote-service fetch fetch-install fetch-service
 
@@ -95,6 +97,7 @@ fetch:
 	JELLYFIN_USER="$(JELLYFIN_USER)" \
 	JELLYFIN_PASS="$(JELLYFIN_PASS)" \
 	MIN_SEEDERS="$(MIN_SEEDERS)" \
+	TMDB_TOKEN="$(TMDB_TOKEN)" \
 	node server.js
 
 fetch-service:
@@ -107,6 +110,7 @@ fetch-service:
 	JELLYFIN_USER="$(JELLYFIN_USER)" \
 	JELLYFIN_PASS="$(JELLYFIN_PASS)" \
 	MIN_SEEDERS="$(MIN_SEEDERS)" \
+	TMDB_TOKEN="$(TMDB_TOKEN)" \
 	bash scripts/install-fetch-service.sh
 
 clean:

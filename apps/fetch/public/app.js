@@ -130,8 +130,13 @@
       // Size
       badges.push(`<span class="badge badge-size">${r.size}</span>`);
 
+      const posterHtml = r.poster
+        ? `<img class="result-poster" src="${r.poster}" alt="" loading="lazy">`
+        : `<div class="result-poster result-poster-empty"></div>`;
+
       return `
         <li class="${classes.join(' ')}" tabindex="0" data-index="${i}">
+          ${posterHtml}
           <div class="result-info">
             <div class="result-title">${escapeHtml(r.name)}</div>
             <div class="result-meta">${badges.join('')}</div>
