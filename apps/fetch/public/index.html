@@ -9,6 +9,7 @@
   <body>
     <main class="app">
       <nav class="nav-bar" id="navBar">
+        <button class="nav-tab" data-view="discover">Discover</button>
         <button class="nav-tab active" data-view="search">Search</button>
         <button class="nav-tab" data-view="downloads">Downloads</button>
       </nav>
@@ -34,6 +35,35 @@
 
         <ul class="results-list" id="resultsList"></ul>
       </section>
+
+      <section class="view" id="discoverView">
+        <div class="discover-backdrop" id="discoverBackdrop"></div>
+        <div class="discover-rows" id="discoverRows"></div>
+        <div class="discover-loading" id="discoverLoading">
+          <div class="shimmer-row"><div class="shimmer-title"></div><div class="shimmer-posters"><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div></div></div>
+          <div class="shimmer-row"><div class="shimmer-title"></div><div class="shimmer-posters"><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div></div></div>
+          <div class="shimmer-row"><div class="shimmer-title"></div><div class="shimmer-posters"><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div><div class="shimmer-poster"></div></div></div>
+        </div>
+      </section>
+
+      <!-- Detail panel overlay -->
+      <div class="detail-panel hidden" id="detailPanel">
+        <div class="detail-backdrop" id="detailBackdrop"></div>
+        <div class="detail-content">
+          <img class="detail-poster" id="detailPoster" alt="">
+          <div class="detail-info">
+            <h2 class="detail-title" id="detailTitle"></h2>
+            <div class="detail-meta" id="detailMeta"></div>
+            <div class="detail-ratings" id="detailRatings"></div>
+            <p class="detail-overview" id="detailOverview"></p>
+            <div class="detail-torrent" id="detailTorrent">
+              <div class="detail-torrent-loading">Searching for best torrent...</div>
+            </div>
+            <button class="detail-download-btn hidden" id="detailDownloadBtn">Download</button>
+            <div class="detail-unavailable hidden" id="detailUnavailable">Not available in good quality</div>
+          </div>
+        </div>
+      </div>
 
       <section class="view" id="downloadsView">
         <ul class="downloads-list" id="downloadsList"></ul>

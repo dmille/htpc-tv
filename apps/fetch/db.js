@@ -24,6 +24,20 @@ db.exec(`
     completed_at TEXT
   );
 
+  CREATE TABLE IF NOT EXISTS discover_cache (
+    row_name TEXT PRIMARY KEY,
+    data TEXT NOT NULL,
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS ratings_cache (
+    title_key TEXT PRIMARY KEY,
+    rt_score INTEGER,
+    metacritic INTEGER,
+    imdb_rating REAL,
+    cached_at TEXT DEFAULT (datetime('now'))
+  );
+
   CREATE TABLE IF NOT EXISTS library (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     jellyfin_id TEXT UNIQUE NOT NULL,
@@ -70,6 +84,24 @@ const getLibraryMovies = db.prepare(`SELECT name, year FROM library WHERE type =
 
 const getLibrarySeries = db.prepare(`SELECT name FROM library WHERE type = 'series'`);
 
+// Discover cache
+const setDiscoverRow = db.prepare(`
+  INSERT OR REPLACE INTO discover_cache (row_name, data, updated_at)
+  VALUES (@rowName, @data, datetime('now'))
+`);
+
+const getDiscoverRow = db.prepare(`SELECT * FROM discover_cache WHERE row_name = @rowName`);
+
+const getAllDiscoverRows = db.prepare(`SELECT * FROM discover_cache ORDER BY rowid`);
+
+// Ratings cache
+const setRating = db.prepare(`
+  INSERT OR REPLACE INTO ratings_cache (title_key, rt_score, metacritic, imdb_rating, cached_at)
+  VALUES (@titleKey, @rtScore, @metacritic, @imdbRating, datetime('now'))
+`);
+
+const getRating = db.prepare(`SELECT * FROM ratings_cache WHERE title_key = @titleKey`);
+
 module.exports = {
   db,
   insertDownload,
@@ -84,4 +116,9 @@ module.exports = {
   getLibraryItems,
   getLibraryMovies,
   getLibrarySeries,
+  setDiscoverRow,
+  getDiscoverRow,
+  getAllDiscoverRows,
+  setRating,
+  getRating,
 };

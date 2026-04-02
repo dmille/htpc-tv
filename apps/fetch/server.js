@@ -5,6 +5,7 @@ const transmission = require('./transmission');
 const { search } = require('./search');
 const jellyfin = require('./jellyfin');
 const { addPosters } = require('./tmdb');
+const discover = require('./discover');
 
 const app = express();
 const PORT = process.env.FETCH_PORT || 8881;
@@ -160,7 +161,69 @@ app.delete('/api/downloads/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
+// Discover rows (cached)
+app.get('/api/discover', (req, res) => {
+  try {
+    const rows = discover.getDiscoverData();
+    res.json(rows);
+  } catch (err) {
+    console.error('[discover] Error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch discover data' });
+  }
+});
+
+// Discover item: search for best torrent for a TMDB item
+app.get('/api/discover/item/:tmdbId', async (req, res) => {
+  const { tmdbId } = req.params;
+  const { type } = req.query; // 'movie' or 'tv'
+
+  try {
+    // Look up item on TMDB to get title + year
+    const endpoint = type === 'tv' ? `/tv/${tmdbId}` : `/movie/${tmdbId}`;
+    const tmdbRes = await fetch(`https://api.themoviedb.org/3${endpoint}`, {
+      headers: { Authorization: `Bearer ${process.env.TMDB_TOKEN}` },
+    });
+    if (!tmdbRes.ok) return res.status(404).json({ error: 'TMDB item not found' });
+
+    const item = await tmdbRes.json();
+    const title = item.title || item.name;
+    const year = (item.release_date || item.first_air_date || '').substring(0, 4);
+    const query = year ? `${title} ${year}` : title;
+
+    // Search for torrents using existing pipeline
+    const cat = type === 'tv' ? 208 : 207;
+    const results = await search(query, cat);
+
+    if (results.length === 0) {
+      return res.json({ available: false, title, year });
+    }
+
+    const best = results[0];
+    res.json({
+      available: true,
+      title,
+      year,
+      torrent: {
+        name: best.name,
+        magnet: best.magnet,
+        infoHash: best.infoHash,
+        resolution: best.resolution,
+        source: best.source,
+        size: best.size,
+        sizeBytes: best.sizeBytes,
+        seeders: best.seeders,
+        type: best.type,
+        episode: best.episode,
+      },
+    });
+  } catch (err) {
+    console.error('[discover/item] Error:', err.message);
+    res.status(502).json({ error: 'Failed to search for torrent' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`[fetch] Server running on http://localhost:${PORT}`);
   jellyfin.startSync();
+  discover.startRefresh();
 });

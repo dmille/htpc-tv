@@ -11,6 +11,7 @@ set -euo pipefail
 : "${JELLYFIN_PASS:?JELLYFIN_PASS is required}"
 : "${MIN_SEEDERS:?MIN_SEEDERS is required}"
 : "${TMDB_TOKEN:=}"
+: "${OMDB_KEY:=}"
 
 SERVICE_DIR="$HOME/.config/systemd/user"
 SERVICE_FILE="$SERVICE_DIR/fetch.service"
@@ -37,6 +38,7 @@ Environment=JELLYFIN_USER=${JELLYFIN_USER}
 Environment=JELLYFIN_PASS=${JELLYFIN_PASS}
 Environment=MIN_SEEDERS=${MIN_SEEDERS}
 Environment=TMDB_TOKEN=${TMDB_TOKEN}
+Environment=OMDB_KEY=${OMDB_KEY}
 ExecStart=${NODE_BIN} server.js
 Restart=on-failure
 RestartSec=3

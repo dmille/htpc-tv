@@ -21,6 +21,7 @@ JELLYFIN_PASS := jellyfin
 MIN_SEEDERS := 2
 -include apps/fetch/.env
 export TMDB_TOKEN
+export OMDB_KEY
 
 .PHONY: help bootstrap packages chrome configure launcher autostart doctor run clean uninstall remote remote-install remote-service fetch fetch-install fetch-service
 
@@ -98,6 +99,7 @@ fetch:
 	JELLYFIN_PASS="$(JELLYFIN_PASS)" \
 	MIN_SEEDERS="$(MIN_SEEDERS)" \
 	TMDB_TOKEN="$(TMDB_TOKEN)" \
+	OMDB_KEY="$(OMDB_KEY)" \
 	node server.js
 
 fetch-service:
@@ -111,6 +113,7 @@ fetch-service:
 	JELLYFIN_PASS="$(JELLYFIN_PASS)" \
 	MIN_SEEDERS="$(MIN_SEEDERS)" \
 	TMDB_TOKEN="$(TMDB_TOKEN)" \
+	OMDB_KEY="$(OMDB_KEY)" \
 	bash scripts/install-fetch-service.sh
 
 clean:
