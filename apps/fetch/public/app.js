@@ -115,21 +115,6 @@
         badges.push(`<span class="badge ${resClass}">${r.resolution}</span>`);
       }
 
-      // Source
-      if (r.source) {
-        badges.push(`<span class="badge badge-source">${r.source}</span>`);
-      }
-
-      // Codec
-      if (r.codec) {
-        badges.push(`<span class="badge badge-codec">${r.codec}</span>`);
-      }
-
-      // Trusted
-      if (r.trusted) {
-        badges.push(`<span class="badge badge-trusted">VIP</span>`);
-      }
-
       // Episode/Season
       if (r.type === 'episode' && r.episode) {
         badges.push(`<span class="badge badge-episode">${r.episode}</span>`);

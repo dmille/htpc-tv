@@ -77,8 +77,44 @@ function parseYear(name) {
 function cleanTitle(name) {
   let title = name
     .replace(/\./g, ' ')
+    // Strip resolution, source, codec
+    .replace(/\b(2160p|1080p|720p|480p|4K)\b/gi, '')
+    .replace(/\b(BluRay|Blu-ray|WEB-DL|WEBDL|WEBRip|WEB-Rip|BRRip|BDRip|HDRip|HDTV|WEB|DVDRip|REMUX)\b/gi, '')
+    .replace(/\b(x264|x265|h\.?264|h\.?265|HEVC|VC-1|AVC|AV1)\b/gi, '')
+    // Audio tags
+    .replace(/\b(AAC\d?[\s.]?\d?|AC3|DTS[\s-]?HD|DTS|DD[P ]?\d[\s.]?\d|DDP\d[\s.]?\d|FLAC|TrueHD|Atmos|OPUS)\b/gi, '')
+    .replace(/\bMA\s*\d[\s.]\d\b/gi, '')
+    .replace(/(?<=\s)\d[\s.]\d(?=\s|$)/g, '') // channel counts like "5 1", "7 1"
+    // Technical tags
+    .replace(/\b(10bit|10-bit|10bits?|HDR|HDR10|SDR|IMAX|MULTi|NF|AMZN|HULU|ATVP|DSNP|IP)\b/gi, '')
+    // Size fragments like "1 85GB", "1400MB"
+    .replace(/\b\d+[\s.]?\d*\s*(GB|MB|KB)\b/gi, '')
+    // Release groups and scene tags (catch-all: strip trailing "-GroupName" pattern too)
+    .replace(/\b(YIFY|RARBG|EVO|GalaxyRG\w*|BONE|ETRG|FGT|MkvCage|EtHD|TGx|LAMA|PSA|ELiTE|ETHEL|FLUX|SuccessfulCrab|EDITH|ION10|DOLORES|MeGusta|AMB3R|GPRS|MVGroup|VPPV|JYK|MP4|SLOT|monkee|RMTeam|ADWeb|RARBM|CAKES|SHORTBREHD|OFT|CtrlHD|iLLUSiON|UnKn0wn|MEMENTO|Joy|UTR|Ozlem|Rapta|KRaLi|SNOW|TCR|Asia|GF)\b/gi, '')
+    // Release tags
+    .replace(/\b(REPACK\d?|PROPER|INTERNAL|iNTERNAL|EXTENDED|REMASTERED|UNCUT|DC|Directors?\s*Cut|Assembly\s*Cut|Special\s*Edition|Subs)\b/gi, '')
+    // Season/episode tags (shown as badges)
+    .replace(/\bS\d{2}E\d{2}\b/gi, '')
+    .replace(/\bS\d{2}\b/gi, '')
+    .replace(/\b(Season|Complete|Full|COMPLETE|Part\s*\d+|P\d{2})\b/gi, '')
+    // Language tags
+    .replace(/\b(Eng|Ita|Spa|German|KOREAN|FRE|LATINO|ITA|ENG[\s-]ITA|Multi[\s-]?Subs?|MultiSub\w*|DL|DTSHD|EN|NL|GR|Br|Audio)\b/gi, '')
+    // Brackets and their contents, parens with non-year content
+    .replace(/\[.*?\]/g, '')
+    .replace(/\[.*$/g, '') // unclosed brackets
+    .replace(/\{.*?\}/g, '')
+    .replace(/\((?!\d{4}\))[^)]*\)/g, '') // strip parens unless they contain a year
+    .replace(/\((\d{4})\)/g, '$1') // (2024) -> 2024
+    // URL prefixes
+    .replace(/www\.\S+\s+-\s+/gi, '')
+    // Cleanup
+    .replace(/[-_]/g, ' ')
     .replace(/\s+/g, ' ')
-    .trim();
+    .trim()
+    // Strip orphaned single numbers at end (leftover channel/season counts)
+    .replace(/\s+\d\s*$/, '')
+    // Strip trailing punctuation, brackets, whitespace
+    .replace(/[\s\-:,\[\]\(\)]+$/, '');
   return title;
 }
 
