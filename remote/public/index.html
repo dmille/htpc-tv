@@ -31,22 +31,26 @@
         <span class="status-text" id="status-text">connecting...</span>
       </div>
 
-      <!-- D-Pad -->
-      <div class="dpad">
-        <button class="dpad-btn up" data-action="up" aria-label="Up">
-          <svg viewBox="0 0 24 24"><path d="M12 6l-8 8h16z"/></svg>
-        </button>
-        <button class="dpad-btn left" data-action="left" aria-label="Left">
-          <svg viewBox="0 0 24 24"><path d="M6 12l8-8v16z"/></svg>
-        </button>
-        <button class="dpad-btn center" data-action="ok" aria-label="OK">OK</button>
-        <button class="dpad-btn right" data-action="right" aria-label="Right">
-          <svg viewBox="0 0 24 24"><path d="M18 12l-8-8v16z"/></svg>
-        </button>
-        <button class="dpad-btn down" data-action="down" aria-label="Down">
-          <svg viewBox="0 0 24 24"><path d="M12 18l8-8H4z"/></svg>
-        </button>
+      <!-- D-Pad in circular ring -->
+      <div class="dpad-ring">
+        <div class="dpad">
+          <button class="dpad-btn up" data-action="up" aria-label="Up">
+            <svg viewBox="0 0 24 24"><path d="M12 6l-8 8h16z"/></svg>
+          </button>
+          <button class="dpad-btn left" data-action="left" aria-label="Left">
+            <svg viewBox="0 0 24 24"><path d="M6 12l8-8v16z"/></svg>
+          </button>
+          <button class="dpad-btn center" data-action="ok" aria-label="OK">OK</button>
+          <button class="dpad-btn right" data-action="right" aria-label="Right">
+            <svg viewBox="0 0 24 24"><path d="M18 12l-8-8v16z"/></svg>
+          </button>
+          <button class="dpad-btn down" data-action="down" aria-label="Down">
+            <svg viewBox="0 0 24 24"><path d="M12 18l8-8H4z"/></svg>
+          </button>
+        </div>
       </div>
+
+      <div class="divider"></div>
 
       <!-- Action buttons -->
       <div class="actions">
@@ -64,6 +68,8 @@
         </button>
       </div>
 
+      <div class="divider"></div>
+
       <!-- Volume controls -->
       <div class="volume">
         <button class="volume-btn" data-volume="down" aria-label="Volume Down">
@@ -77,26 +83,25 @@
         </button>
       </div>
 
-      <!-- Text input -->
-      <div class="text-section">
-        <input
-          type="text"
-          class="text-input"
-          id="text-input"
-          placeholder="Type here, Mote will send it!"
-          maxlength="500"
-          autocomplete="off"
-          enterkeyhint="send"
-        />
-        <div class="text-buttons">
-          <button class="text-btn send" id="btn-send">Send Text</button>
-          <button class="text-btn send-enter" id="btn-send-enter">Send + Enter</button>
-        </div>
-      </div>
+      <!-- Keyboard toggle -->
+      <button class="keyboard-toggle" id="btn-keyboard" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M20 5H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></svg>
+        <span>Keyboard</span>
+      </button>
+      <input
+        type="text"
+        class="keyboard-input"
+        id="keyboard-input"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        aria-label="Live keyboard input"
+      />
 
       <!-- Keyboard hint -->
       <div class="hint">
-        Keyboard: arrows = navigate, enter = OK, esc = back, h = home, r = reload, +/- = volume, m = mute
+        arrows = navigate, enter = OK, esc = back, h = home, r = reload, +/- = vol, m = mute
       </div>
     </div>
 

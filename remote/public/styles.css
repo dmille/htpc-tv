@@ -1,20 +1,25 @@
 :root {
-  --bg: #1a1028;
-  --bg-grad: radial-gradient(ellipse at 50% 20%, #2a1848 0%, #1a1028 70%);
-  --surface: rgba(255, 255, 255, 0.07);
-  --surface-hover: rgba(255, 255, 255, 0.14);
-  --surface-active: rgba(255, 255, 255, 0.2);
-  --text: #f0e8ff;
-  --text-muted: rgba(240, 232, 255, 0.5);
+  --bg: #111118;
+  --remote-bg: linear-gradient(170deg, #252535 0%, #1a1a28 50%, #151520 100%);
+  --remote-border: rgba(255, 255, 255, 0.06);
+  --remote-shadow: 0 0.8rem 3rem rgba(0, 0, 0, 0.6), 0 0.1rem 0 rgba(255, 255, 255, 0.04) inset;
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-hover: rgba(255, 255, 255, 0.12);
+  --surface-active: rgba(255, 255, 255, 0.18);
+  --surface-raised: rgba(255, 255, 255, 0.08);
+  --text: #e8e4f0;
+  --text-muted: rgba(232, 228, 240, 0.4);
   --accent: #b06cff;
   --accent-glow: rgba(176, 108, 255, 0.35);
   --ok-color: #5ce0a0;
-  --ok-glow: rgba(92, 224, 160, 0.3);
+  --ok-glow: rgba(92, 224, 160, 0.25);
   --back-color: #ff7a7a;
   --home-color: #ffb84d;
   --reload-color: #6cc4ff;
-  --radius: 1rem;
-  --radius-sm: 0.6rem;
+  --radius: 0.85rem;
+  --radius-sm: 0.5rem;
+  --btn-shadow: 0 0.15rem 0.3rem rgba(0, 0, 0, 0.3), 0 0.05rem 0 rgba(255, 255, 255, 0.05) inset;
+  --btn-shadow-active: 0 0.05rem 0.1rem rgba(0, 0, 0, 0.3) inset;
 }
 
 * {
@@ -32,34 +37,42 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   background: var(--bg);
-  background-image: var(--bg-grad);
   color: var(--text);
-  font-family: "Comic Sans MS", "Chalkboard SE", "Comic Neue", system-ui, sans-serif;
+  font-family: "SF Pro Rounded", "Comic Sans MS", "Chalkboard SE", "Comic Neue", system-ui, sans-serif;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+  padding: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
+/* --- Remote body --- */
+
 .remote {
   width: 100%;
-  max-width: 22rem;
-  padding: 1.2rem 1rem 2rem;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--remote-bg);
+  padding: 1.5rem 1.2rem 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.2rem;
+  justify-content: space-evenly;
+  gap: 0;
+  position: relative;
 }
 
 /* --- Mote character --- */
 
 .mote {
   position: relative;
-  width: 5rem;
+  width: 6.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: transform 0.3s ease;
+  margin-top: 0.3rem;
 }
 
 .mote { animation: mote-float 4s ease-in-out infinite; }
@@ -67,6 +80,14 @@ body {
 .mote.zap { animation: mote-zap 0.25s ease; }
 .mote.typing { animation: mote-wiggle 0.3s ease; }
 .mote.sad { animation: mote-shake 0.4s ease; }
+.mote.dizzy { animation: mote-spin 0.6s ease; }
+.mote.sleepy { animation: mote-droop 3s ease-in-out; }
+.mote.excited { animation: mote-excited 0.5s ease; }
+.mote.love { animation: mote-pulse-love 0.6s ease; }
+.mote.wave { animation: mote-wave 0.8s ease; }
+.mote.peek { animation: none; }
+.mote.sneeze { animation: mote-sneeze 0.5s ease; }
+.mote.dance { animation: mote-dance 0.6s ease; }
 
 @keyframes mote-bounce {
   0%, 100% { transform: translateY(0); }
@@ -97,6 +118,58 @@ body {
   50% { transform: translateY(-0.25rem); }
 }
 
+@keyframes mote-spin {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(15deg); }
+  50% { transform: rotate(-15deg); }
+  75% { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes mote-droop {
+  0%, 100% { transform: translateY(0); }
+  30%, 70% { transform: translateY(0.3rem); }
+}
+
+@keyframes mote-excited {
+  0%, 100% { transform: translateY(0) scale(1); }
+  20% { transform: translateY(-0.8rem) scale(1.1); }
+  40% { transform: translateY(0) scale(1); }
+  60% { transform: translateY(-0.5rem) scale(1.05); }
+  80% { transform: translateY(0) scale(1); }
+}
+
+@keyframes mote-pulse-love {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.12); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.08); }
+}
+
+@keyframes mote-wave {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(8deg); }
+  30% { transform: rotate(-8deg); }
+  45% { transform: rotate(6deg); }
+  60% { transform: rotate(-6deg); }
+  75% { transform: rotate(3deg); }
+}
+
+@keyframes mote-sneeze {
+  0%, 100% { transform: scale(1) translateY(0); }
+  30% { transform: scale(0.9) translateY(0.15rem); }
+  50% { transform: scale(1.2) translateY(-0.4rem); }
+  70% { transform: scale(1.05) translateY(0); }
+}
+
+@keyframes mote-dance {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(-0.4rem) rotate(-5deg); }
+  40% { transform: translateX(0.4rem) rotate(5deg); }
+  60% { transform: translateX(-0.3rem) rotate(-3deg); }
+  80% { transform: translateX(0.3rem) rotate(3deg); }
+}
+
 .mote-antenna {
   display: flex;
   flex-direction: column;
@@ -104,8 +177,8 @@ body {
 }
 
 .mote-antenna-ball {
-  width: 0.65rem;
-  height: 0.65rem;
+  width: 0.7rem;
+  height: 0.7rem;
   background: var(--accent);
   border-radius: 50%;
   box-shadow: 0 0 0.6rem var(--accent-glow);
@@ -125,17 +198,17 @@ body {
 
 .mote-antenna-stick {
   width: 0.15rem;
-  height: 0.8rem;
-  background: rgba(255, 255, 255, 0.25);
+  height: 0.85rem;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 0.1rem;
 }
 
 .mote-body {
-  width: 4rem;
-  height: 3.2rem;
+  width: 4.5rem;
+  height: 3.5rem;
   background: var(--surface);
-  border: 0.12rem solid rgba(255, 255, 255, 0.12);
-  border-radius: 1.2rem;
+  border: 0.1rem solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.3rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -145,21 +218,19 @@ body {
 .mote-face {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.9rem;
   position: relative;
 }
 
 .mote-eye {
-  width: 0.5rem;
-  height: 0.6rem;
+  width: 0.55rem;
+  height: 0.65rem;
   background: var(--text);
   border-radius: 50%;
   transition: all 0.2s;
 }
 
-.mote.blink .mote-eye {
-  transform: scaleY(0.1);
-}
+.mote.blink .mote-eye { transform: scaleY(0.1); }
 
 .mote.idle-smile .mote-eye {
   height: 0.3rem;
@@ -168,8 +239,8 @@ body {
 }
 
 .mote.idle-oo .mote-eye {
-  width: 0.55rem;
-  height: 0.65rem;
+  width: 0.5rem;
+  height: 0.55rem;
 }
 
 .mote.happy .mote-eye {
@@ -185,7 +256,7 @@ body {
 
 .mote-mouth {
   position: absolute;
-  bottom: -0.5rem;
+  bottom: -0.55rem;
   left: 50%;
   transform: translateX(-50%);
   width: 0.6rem;
@@ -195,32 +266,30 @@ body {
   transition: all 0.2s;
 }
 
-/* Idle mouth expressions */
-
 .mote.idle-smile .mote-mouth {
-  width: 0.8rem;
-  height: 0.3rem;
+  width: 0.7rem;
+  height: 0.25rem;
   border-radius: 0 0 0.5rem 0.5rem;
   background: var(--ok-color);
 }
 
 .mote.idle-oo .mote-mouth {
-  width: 0.35rem;
-  height: 0.35rem;
+  width: 0.3rem;
+  height: 0.3rem;
   border-radius: 50%;
   background: var(--reload-color);
 }
 
 .mote.idle-smirk .mote-mouth {
-  width: 0.5rem;
-  height: 0.2rem;
+  width: 0.45rem;
+  height: 0.18rem;
   border-radius: 0 0 0.4rem 0.1rem;
   transform: translateX(-35%);
 }
 
 .mote.idle-tongue .mote-mouth {
-  width: 0.55rem;
-  height: 0.25rem;
+  width: 0.5rem;
+  height: 0.22rem;
   border-radius: 0 0 0.3rem 0.3rem;
   overflow: visible;
 }
@@ -228,11 +297,11 @@ body {
 .mote-mouth::after {
   content: '';
   position: absolute;
-  bottom: -0.2rem;
+  bottom: -0.18rem;
   left: 50%;
   transform: translateX(-50%) scaleY(0);
-  width: 0.25rem;
-  height: 0.22rem;
+  width: 0.22rem;
+  height: 0.2rem;
   background: #ff8fa0;
   border-radius: 0 0 0.2rem 0.2rem;
   transition: transform 0.15s ease;
@@ -242,34 +311,170 @@ body {
   transform: translateX(-50%) scaleY(1);
 }
 
-/* Mood mouth states */
-
 .mote.happy .mote-mouth {
-  width: 0.8rem;
-  height: 0.35rem;
+  width: 0.7rem;
+  height: 0.3rem;
   border-radius: 0 0 0.5rem 0.5rem;
   background: var(--ok-color);
 }
 
 .mote.sad .mote-mouth {
-  width: 0.5rem;
-  height: 0.15rem;
+  width: 0.45rem;
+  height: 0.12rem;
   border-radius: 0.3rem;
   background: var(--back-color);
 }
 
 .mote.zap .mote-mouth {
-  width: 0.4rem;
-  height: 0.4rem;
+  width: 0.35rem;
+  height: 0.35rem;
   border-radius: 50%;
   background: var(--home-color);
 }
 
+/* --- Dizzy --- */
+.mote.dizzy .mote-eye {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: transparent;
+  border: 0.12rem solid var(--text);
+  animation: eye-spiral 0.6s linear;
+}
+
+@keyframes eye-spiral {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.mote.dizzy .mote-mouth {
+  width: 0.5rem;
+  height: 0.18rem;
+  border-radius: 0.3rem;
+  background: var(--text-muted);
+}
+
+/* --- Sleepy --- */
+.mote.sleepy .mote-eye {
+  height: 0.12rem;
+  border-radius: 0.3rem;
+  transform: translateY(0.1rem);
+}
+
+.mote.sleepy .mote-mouth {
+  width: 0.45rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* --- Excited --- */
+.mote.excited .mote-eye {
+  width: 0.65rem;
+  height: 0.7rem;
+  background: var(--home-color);
+  box-shadow: 0 0 0.4rem rgba(255, 184, 77, 0.4);
+}
+
+.mote.excited .mote-mouth {
+  width: 0.8rem;
+  height: 0.4rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  background: var(--ok-color);
+}
+
+/* --- Love --- */
+.mote.love .mote-eye {
+  width: 0.6rem;
+  height: 0.55rem;
+  background: #ff6b9d;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 0 0.4rem rgba(255, 107, 157, 0.4);
+}
+
+.mote.love .mote-mouth {
+  width: 0.7rem;
+  height: 0.3rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  background: #ff6b9d;
+}
+
+/* --- Wave --- */
+.mote.wave .mote-eye {
+  height: 0.3rem;
+  border-radius: 0.3rem 0.3rem 0 0;
+  transform: translateY(-0.05rem);
+}
+
+.mote.wave .mote-mouth {
+  width: 0.7rem;
+  height: 0.25rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  background: var(--ok-color);
+}
+
+/* --- Peek --- */
+.mote.peek .mote-eye.left {
+  transform: translateX(0.15rem);
+}
+
+.mote.peek .mote-eye.right {
+  transform: translateX(0.15rem);
+}
+
+.mote.peek.peek-left .mote-eye.left,
+.mote.peek.peek-left .mote-eye.right {
+  transform: translateX(-0.15rem);
+}
+
+.mote.peek .mote-mouth {
+  width: 0.4rem;
+  height: 0.15rem;
+  border-radius: 0.3rem;
+}
+
+/* --- Sneeze --- */
+.mote.sneeze .mote-eye {
+  height: 0.12rem;
+  border-radius: 0.3rem;
+}
+
+.mote.sneeze .mote-mouth {
+  width: 0.7rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--home-color);
+}
+
+.mote.sneeze .mote-antenna-ball {
+  background: var(--home-color);
+  box-shadow: 0 0 1.2rem rgba(255, 184, 77, 0.6);
+}
+
+/* --- Dance --- */
+.mote.dance .mote-eye {
+  height: 0.3rem;
+  border-radius: 0.3rem 0.3rem 0 0;
+  transform: translateY(-0.05rem);
+}
+
+.mote.dance .mote-mouth {
+  width: 0.8rem;
+  height: 0.35rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  background: var(--accent);
+}
+
+.mote.dance .mote-antenna-ball {
+  animation: antenna-pulse 0.3s ease-in-out infinite;
+}
+
 .mote-speech {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   text-align: center;
-  min-height: 1.2rem;
+  min-height: 1rem;
   transition: opacity 0.2s;
 }
 
@@ -278,22 +483,24 @@ body {
 .status {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.7rem;
+  gap: 0.35rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .status-dot {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.4rem;
+  height: 0.4rem;
   border-radius: 50%;
-  background: #666;
+  background: #444;
   transition: background 0.3s;
 }
 
 .status-dot.ok {
   background: var(--ok-color);
-  box-shadow: 0 0 0.4rem var(--ok-glow);
+  box-shadow: 0 0 0.3rem var(--ok-glow);
 }
 
 .status-dot.bad {
@@ -302,106 +509,198 @@ body {
 
 /* --- D-Pad --- */
 
-.dpad {
-  display: grid;
-  grid-template-columns: repeat(3, 3.6rem);
-  grid-template-rows: repeat(3, 3.6rem);
-  gap: 0.35rem;
+.dpad-ring {
+  width: 15rem;
+  height: 15rem;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.3) inset, 0 0.1rem 0 rgba(255, 255, 255, 0.03);
+  display: flex;
+  align-items: center;
   justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.dpad {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .dpad-btn {
   border: none;
-  border-radius: var(--radius);
-  background: var(--surface);
+  background: transparent;
   color: var(--text);
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.12s, transform 0.1s, box-shadow 0.12s;
+  position: absolute;
+  transition: background 0.1s, transform 0.08s;
   -webkit-user-select: none;
   user-select: none;
 }
 
 .dpad-btn svg {
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 1.5rem;
+  height: 1.5rem;
   fill: currentColor;
+  opacity: 0.7;
 }
 
-.dpad-btn:hover {
-  background: var(--surface-hover);
+.dpad-btn:hover svg { opacity: 1; }
+.dpad-btn:active { transform: scale(0.9); }
+.dpad-btn:active svg { opacity: 1; }
+
+/* Arrow buttons */
+.dpad-btn.up {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5rem;
+  height: 4.5rem;
+  border-radius: 2.5rem 2.5rem 1rem 1rem;
+  padding-bottom: 1rem;
 }
 
-.dpad-btn:active {
-  background: var(--surface-active);
-  transform: scale(0.92);
+.dpad-btn.down {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5rem;
+  height: 4.5rem;
+  border-radius: 1rem 1rem 2.5rem 2.5rem;
+  padding-top: 1rem;
 }
 
-.dpad-btn.up    { grid-column: 2; grid-row: 1; }
-.dpad-btn.left  { grid-column: 1; grid-row: 2; }
-.dpad-btn.center { grid-column: 2; grid-row: 2; }
-.dpad-btn.right { grid-column: 3; grid-row: 2; }
-.dpad-btn.down  { grid-column: 2; grid-row: 3; }
+.dpad-btn.left {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4.5rem;
+  height: 5rem;
+  border-radius: 2.5rem 1rem 1rem 2.5rem;
+  padding-right: 1rem;
+}
 
+.dpad-btn.right {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4.5rem;
+  height: 5rem;
+  border-radius: 1rem 2.5rem 2.5rem 1rem;
+  padding-left: 1rem;
+}
+
+.dpad-btn.up:active { transform: translateX(-50%) scale(0.9); }
+.dpad-btn.down:active { transform: translateX(-50%) scale(0.9); }
+.dpad-btn.left:active { transform: translateY(-50%) scale(0.9); }
+.dpad-btn.right:active { transform: translateY(-50%) scale(0.9); }
+
+.dpad-btn.up:hover,
+.dpad-btn.down:hover,
+.dpad-btn.left:hover,
+.dpad-btn.right:hover {
+  background: var(--surface);
+}
+
+/* OK button — center of d-pad */
 .dpad-btn.center {
-  background: var(--ok-color);
-  color: #1a1028;
-  font-size: 1rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 5rem;
+  height: 5rem;
   border-radius: 50%;
-  box-shadow: 0 0 1.2rem var(--ok-glow);
+  background: var(--surface-raised);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--btn-shadow);
+  color: var(--ok-color);
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  z-index: 1;
 }
 
 .dpad-btn.center:hover {
-  background: #7aecb6;
+  background: var(--surface-hover);
+  box-shadow: var(--btn-shadow), 0 0 0.8rem var(--ok-glow);
 }
 
 .dpad-btn.center:active {
-  background: #4ccc8a;
+  transform: translate(-50%, -50%) scale(0.94);
+  box-shadow: var(--btn-shadow-active);
+}
+
+/* --- Divider --- */
+
+.divider {
+  width: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 /* --- Action buttons --- */
 
 .actions {
   display: flex;
-  gap: 0.6rem;
-  width: 100%;
+  gap: 2rem;
   justify-content: center;
 }
 
 .action-btn {
-  flex: 1;
-  max-width: 6.5rem;
+  width: 4.5rem;
+  height: 4.5rem;
   border: none;
-  border-radius: var(--radius);
-  background: var(--surface);
+  border-radius: 50%;
+  background: var(--surface-raised);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--btn-shadow);
   color: var(--text);
   font-family: inherit;
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 0.7rem 0.4rem;
+  font-size: 0;
   cursor: pointer;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
-  transition: background 0.12s, transform 0.1s;
+  justify-content: center;
+  transition: background 0.1s, transform 0.08s, box-shadow 0.1s;
   -webkit-user-select: none;
   user-select: none;
+  position: relative;
 }
 
 .action-btn svg {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.8rem;
+  height: 1.8rem;
   fill: currentColor;
+  opacity: 0.8;
 }
 
-.action-btn:hover { background: var(--surface-hover); }
-.action-btn:active { background: var(--surface-active); transform: scale(0.94); }
+.action-btn span {
+  position: absolute;
+  bottom: -0.95rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.action-btn:hover {
+  background: var(--surface-hover);
+}
+
+.action-btn:active {
+  transform: scale(0.9);
+  box-shadow: var(--btn-shadow-active);
+}
 
 .action-btn.back svg  { fill: var(--back-color); }
 .action-btn.home svg  { fill: var(--home-color); }
@@ -411,136 +710,150 @@ body {
 
 .volume {
   display: flex;
-  gap: 0.6rem;
-  width: 100%;
-  justify-content: center;
+  align-items: center;
+  gap: 1.2rem;
 }
 
 .volume-btn {
-  flex: 1;
-  max-width: 6.5rem;
+  width: 4rem;
+  height: 4rem;
   border: none;
-  border-radius: var(--radius);
-  background: var(--surface);
+  border-radius: 50%;
+  background: var(--surface-raised);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--btn-shadow);
   color: var(--text);
   font-family: inherit;
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 0.7rem 0.4rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.12s, transform 0.1s;
+  transition: background 0.1s, transform 0.08s, box-shadow 0.1s;
   -webkit-user-select: none;
   user-select: none;
 }
 
 .volume-btn svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  fill: currentColor;
+  opacity: 0.7;
+}
+
+.volume-btn:hover {
+  background: var(--surface-hover);
+}
+.volume-btn:hover svg { opacity: 1; }
+
+.volume-btn:active {
+  transform: scale(0.9);
+  box-shadow: var(--btn-shadow-active);
+}
+
+.volume-btn.mute {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.volume-btn.mute svg {
   width: 1.4rem;
   height: 1.4rem;
-  fill: currentColor;
+  fill: var(--back-color);
 }
 
-.volume-btn:hover { background: var(--surface-hover); }
-.volume-btn:active { background: var(--surface-active); transform: scale(0.94); }
-.volume-btn.mute svg { fill: var(--back-color); }
+/* --- Keyboard toggle --- */
 
-/* --- Text input --- */
-
-.text-section {
-  width: 100%;
+.keyboard-toggle {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.text-input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 0.12rem solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius);
-  background: rgba(0, 0, 0, 0.3);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.text-input::placeholder {
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 2rem;
+  background: var(--surface);
   color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.text-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0.8rem var(--accent-glow);
-}
-
-.text-buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.text-btn {
-  flex: 1;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 0.65rem 0.5rem;
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
+  padding: 0.7rem 1.4rem;
   cursor: pointer;
-  transition: background 0.12s, transform 0.1s;
+  transition: background 0.12s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
   -webkit-user-select: none;
   user-select: none;
+  letter-spacing: 0.02em;
 }
 
-.text-btn.send {
-  background: var(--accent);
-  color: #fff;
+.keyboard-toggle svg {
+  opacity: 0.6;
 }
 
-.text-btn.send:hover { background: #c084ff; }
-.text-btn.send:active { transform: scale(0.96); }
-
-.text-btn.send-enter {
-  background: var(--surface);
+.keyboard-toggle:hover {
+  background: var(--surface-hover);
   color: var(--text);
-  border: 0.1rem solid rgba(255, 255, 255, 0.1);
 }
 
-.text-btn.send-enter:hover { background: var(--surface-hover); }
-.text-btn.send-enter:active { transform: scale(0.96); }
+.keyboard-toggle:active { transform: scale(0.96); }
+
+.keyboard-toggle.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0.6rem var(--accent-glow);
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.keyboard-toggle.active svg { opacity: 1; }
+
+.keyboard-input {
+  position: fixed;
+  left: -9999px;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
 
 /* --- Hint --- */
 
 .hint {
-  font-size: 0.62rem;
+  font-size: 0.5rem;
   color: var(--text-muted);
   text-align: center;
-  line-height: 1.4;
-  opacity: 0.6;
+  line-height: 1.3;
+  opacity: 0.4;
+  letter-spacing: 0.02em;
+  padding: 0 0.5rem;
 }
 
-/* --- Responsive --- */
+/* --- Responsive: larger screens get the floating remote shape --- */
 
-@media (min-width: 400px) {
+@media (min-width: 480px) {
+  body { padding: 1rem 0; }
+
   .remote {
-    padding: 1.5rem 1.2rem 2.5rem;
-    gap: 1.4rem;
+    max-width: 22rem;
+    min-height: 0;
+    border: 1px solid var(--remote-border);
+    border-radius: 2.5rem;
+    box-shadow: var(--remote-shadow);
+    padding: 1.5rem 1.5rem 1.8rem;
+    justify-content: flex-start;
+    gap: 1rem;
   }
 
-  .dpad {
-    grid-template-columns: repeat(3, 4.2rem);
-    grid-template-rows: repeat(3, 4.2rem);
-    gap: 0.4rem;
+  .dpad-ring {
+    width: 13rem;
+    height: 13rem;
   }
+
+  .dpad-btn.up, .dpad-btn.down { width: 4.2rem; height: 3.8rem; }
+  .dpad-btn.left, .dpad-btn.right { width: 3.8rem; height: 4.2rem; }
+  .dpad-btn.center { width: 4.2rem; height: 4.2rem; font-size: 0.85rem; }
+  .dpad-btn svg { width: 1.2rem; height: 1.2rem; }
+
+  .action-btn { width: 3.2rem; height: 3.2rem; }
+  .action-btn svg { width: 1.15rem; height: 1.15rem; }
+  .volume-btn { width: 2.8rem; height: 2.8rem; }
+  .volume-btn svg { width: 1.1rem; height: 1.1rem; }
 }
 
-@media (min-height: 750px) {
-  .remote {
-    gap: 1.6rem;
-  }
+@media (min-height: 800px) {
+  .remote { gap: 1.1rem; }
 }

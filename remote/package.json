@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "express": "^4.21.0",
+    "ioctl": "^2.0.2",
     "ws": "^8.18.0"
   }
 }

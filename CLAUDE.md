@@ -21,8 +21,9 @@ scripts/              # Bash scripts invoked by Make targets
   uninstall.sh        # Removes launcher dir and autostart file
   install-remote.sh   # Installs Node.js (if needed) and npm deps for Mote
 remote/               # Mote dev remote (Node/Express service)
-  server.js           # Express server: action/text/health endpoints + xdotool
-  package.json        # npm dependencies (express)
+  server.js           # Express server: action/text/health endpoints + uinput/xdotool
+  uinput-keyboard.js  # Virtual input device via /dev/uinput (kernel-level key injection)
+  package.json        # npm dependencies (express, ioctl, ws)
   public/             # Static remote UI
     index.html        # Mote remote control page
     styles.css        # Cartoonish dark theme with Mote character
@@ -88,14 +89,17 @@ When adding new features (new packages, new config, new web assets), update the 
 
 ## Dev Remote (Mote)
 
-Mote is a LAN-only dev remote that sends keyboard input to the HTPC via `xdotool`. It complements the MX3 air mouse for development and as a phone-based fallback.
+Mote is a LAN-only dev remote that acts as a virtual input device on the HTPC, mirroring how a real MX3 air mouse sends Linux input events. It complements the MX3 for development and as a phone-based fallback.
 
 - **Stack**: Node.js + Express + plain HTML/CSS/JS
 - **Port**: 8880 (configurable via `MOTE_PORT`)
-- **Actions**: D-pad, OK (Enter), Back (Escape), Home (Alt+Home), Reload (F5)
-- **Text**: Sends typed text via `xdotool type`
-- **Home behavior**: Sends `Alt+Home` which is Chrome's "go to homepage" shortcut. The homepage is the launcher, so this returns the user to the launcher from any page.
-- **Display detection**: Same approach as `launch-chrome.sh` — uses `$DISPLAY` if set, otherwise scans `/tmp/.X11-unix/`
+- **Input**: Uses `/dev/uinput` to inject real Linux input events at the kernel level (same codes as MX3 air mouse). Falls back to `xdotool` if uinput is unavailable.
+- **Actions**: D-pad (KEY_UP/DOWN/LEFT/RIGHT), OK (KEY_ENTER), Back (KEY_ESC), Home (KEY_HOMEPAGE), Reload (KEY_F5)
+- **Volume**: Sends KEY_VOLUMEUP/KEY_VOLUMEDOWN/KEY_MUTE via uinput. Falls back to `pactl` without uinput.
+- **Text**: Types via uinput char-by-char (US QWERTY map), falling back to `xdotool type` for unmapped characters.
+- **Keyboard mode**: WebSocket-based live typing with `beforeinput` event handling for mobile support.
+- **Home behavior**: Sends `KEY_HOMEPAGE` (172), the browser home key. Chrome handles this natively — the homepage is the launcher, so this returns the user to the launcher from any page.
+- **Display detection**: Uses `$DISPLAY` if set, otherwise scans `/tmp/.X11-unix/`. Only needed for xdotool fallback; uinput works without a display.
 - **Safety**: Action whitelist, safe subprocess execution (no shell interpolation for text)
 - **UI**: Cartoonish "Mote" character theme, works well on phone and laptop
 

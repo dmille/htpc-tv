@@ -31,4 +31,23 @@ if ! grep -q '^HandleLidSwitch=ignore' "$LOGIND_CONF" 2>/dev/null; then
   sudo systemctl restart systemd-logind
 fi
 
+# Set up /dev/uinput access for Mote virtual keyboard
+if ! grep -q '^uinput' /etc/modules-load.d/uinput.conf 2>/dev/null; then
+  echo 'uinput' | sudo tee /etc/modules-load.d/uinput.conf >/dev/null
+fi
+sudo modprobe uinput 2>/dev/null || true
+
+UDEV_RULE='/etc/udev/rules.d/99-uinput.rules'
+UDEV_CONTENT='KERNEL=="uinput", GROUP="input", MODE="0660"'
+if ! grep -qF "$UDEV_CONTENT" "$UDEV_RULE" 2>/dev/null; then
+  echo "$UDEV_CONTENT" | sudo tee "$UDEV_RULE" >/dev/null
+  sudo udevadm control --reload-rules
+  sudo udevadm trigger /dev/uinput
+fi
+
+if ! id -nG "$USER" | grep -qw input; then
+  sudo usermod -aG input "$USER"
+  echo "Added $USER to input group — log out and back in for this to take effect"
+fi
+
 echo "Applied system settings"
