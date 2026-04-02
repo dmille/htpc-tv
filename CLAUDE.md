@@ -33,6 +33,10 @@ web/                  # Launcher webpage (served as file://)
   styles.css          # Dark theme, responsive grid, focus ring for remote nav
   app.js              # Arrow key navigation across tile grid
   assets/             # Placeholder for icons/images (currently empty)
+apps/                 # HTPC apps (each with own Node server + frontend)
+  fetch/              # Torrent search & download app (port 8881)
+plans/                # Implementation plans (markdown)
+  INDEX.md            # Status overview of all plans
 config/               # Placeholder for future config files (currently empty)
 state/                # Gitignored runtime state; only .gitkeep tracked
 ```
@@ -53,6 +57,9 @@ state/                # Gitignored runtime state; only .gitkeep tracked
 - `make clean` - Remove `.tmp/` directory
 - `make remote-install` - Install Node.js and Mote npm dependencies
 - `make remote` - Start the Mote dev remote on port 8880
+- `make fetch-install` - Install Fetch app npm dependencies
+- `make fetch` - Start the Fetch torrent search app on port 8881
+- `make fetch-service` - Install Fetch as a systemd user service
 
 ## Development principles
 
@@ -104,6 +111,75 @@ Mote is a LAN-only dev remote that acts as a virtual input device on the HTPC, m
 - **UI**: Cartoonish "Mote" character theme, works well on phone and laptop
 
 The HTPC UI supports both D-pad navigation and air-mouse pointer input. Tiles are large with generous hit targets, and both hover and focus states are styled.
+
+## Apps (`apps/`)
+
+Apps are self-contained Node.js services that run alongside the launcher. Each app lives in its own directory under `apps/` and is accessible as a tile on the launcher.
+
+### How to build a new app
+
+Every app follows the same pattern established by Fetch (`apps/fetch/`):
+
+**Directory structure:**
+```
+apps/<app-name>/
+  server.js           # Express server (entry point)
+  package.json        # Dependencies (always includes express)
+  public/             # Static frontend (HTML/CSS/JS)
+    index.html
+    styles.css
+    app.js
+```
+
+**Checklist for adding a new app:**
+
+1. **Create the app directory**: `apps/<app-name>/` with `server.js`, `package.json`, and `public/`
+2. **Pick a port**: Next available after 8881 (Fetch). Ports are defined in the Makefile.
+3. **Add a launcher tile**: Add an `<a class="tile" href="http://localhost:<port>" data-app="<name>">` to `web/index.html`
+4. **Add Makefile targets**: `<name>-install`, `<name>`, `<name>-service` (follow Fetch's pattern)
+5. **Add a systemd service script**: `scripts/install-<name>-service.sh` (copy from `install-fetch-service.sh`)
+6. **Update `.gitignore`**: Add `apps/<name>/node_modules/` and any generated files (e.g. `.db`)
+7. **Run `make <name>-service`** to install and enable the service
+
+**Stack conventions:**
+- Backend: Node.js + Express. No other frameworks.
+- Frontend: Plain HTML/CSS/JS. No bundler, no framework.
+- Config: All via environment variables, set in the Makefile and passed through to the systemd service.
+- Database: SQLite via `better-sqlite3` if state is needed. DB file lives in the app directory and is gitignored.
+- External APIs: Use `fetch()` directly. No wrapper libraries unless they provide substantial value.
+
+**Frontend conventions (TV-friendly):**
+- Match the launcher's dark theme: `--bg: #0a0a0f`, frosted glass surfaces, same color variables
+- Large text and hit targets for TV viewing distance
+- Full keyboard/D-pad navigation: Up/Down to move through lists, Enter to select, Escape to go back within the app
+- Home key (KEY_HOMEPAGE) returns to the launcher (Chrome handles this natively in kiosk mode — do NOT use Escape for this)
+- Left/Right arrows for switching between views/tabs (do NOT use Tab — it conflicts with focus navigation and Mote keyboard mode)
+- Frontend polls the backend for live data (no server-side push needed for V1 of anything)
+
+**Service conventions:**
+- Each app runs as a systemd user service (`~/.config/systemd/user/<name>.service`)
+- Services are `Type=simple`, `Restart=on-failure`, `WantedBy=default.target`
+- Network-dependent apps use `After=network-online.target`
+- Manage with: `systemctl --user status/start/stop/restart <name>`
+- Logs: `journalctl --user -u <name> -f`
+
+### Existing apps
+
+**Fetch** (`apps/fetch/`, port 8881): Torrent search and download tracker. Searches TPB via Apibay API, filters by quality (1080p+), submits magnets to Transmission on `titan.local:9091`, tracks download progress. SQLite DB stores download history. Syncs Jellyfin library from `titan.local:8096` every 30 minutes to flag "already in Jellyfin" on search results.
+
+### External services on titan.local
+
+- **Transmission**: `http://titan.local:9091/transmission/rpc` — Torrent client. Auth: `transmission:transmission`. Uses session token (`X-Transmission-Session-Id`) — on 409, read the token from the response header and retry.
+- **Jellyfin**: `http://titan.local:8096` — Media server. Auth: `jellyfin:jellyfin`. Authenticate via `POST /Users/AuthenticateByName` with `X-Emby-Authorization` header to get an access token, then use `X-Emby-Token` header for subsequent requests.
+
+## Implementation plans
+
+Plans live in `plans/` as markdown files. `plans/INDEX.md` is the single place to check the status of all plans.
+
+- To create a plan: add a markdown file in `plans/` (e.g. `plans/screensaver.md`) and add a row to the table in `INDEX.md`.
+- Plan statuses: `draft`, `in-progress`, `done`, `cancelled`.
+- Each plan file should cover: goal, approach, affected files, and open questions.
+- Keep `INDEX.md` updated as plans progress.
 
 ## Testing
 

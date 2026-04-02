@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fetch</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <nav class="nav-bar" id="navBar">
+        <button class="nav-tab active" data-view="search">Search</button>
+        <button class="nav-tab" data-view="downloads">Downloads</button>
+      </nav>
+
+      <section class="view active" id="searchView">
+        <div class="category-bar" id="categoryBar">
+          <button class="cat-btn active" data-cat="0">All</button>
+          <button class="cat-btn" data-cat="207">Movies</button>
+          <button class="cat-btn" data-cat="208">TV</button>
+        </div>
+
+        <div class="search-box">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search movies & TV shows..."
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <div class="results-status" id="resultsStatus"></div>
+
+        <ul class="results-list" id="resultsList"></ul>
+      </section>
+
+      <section class="view" id="downloadsView">
+        <ul class="downloads-list" id="downloadsList"></ul>
+        <div class="empty-state" id="downloadsEmpty">No downloads yet</div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

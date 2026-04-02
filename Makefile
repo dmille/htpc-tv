@@ -10,8 +10,17 @@ CHROME_CMD := google-chrome
 CHROME_FLAGS := --kiosk --homepage=$(LAUNCHER_URL)
 REMOTE_DIR := $(CURDIR)/remote
 MOTE_PORT := 8880
+FETCH_DIR := $(CURDIR)/apps/fetch
+FETCH_PORT := 8881
+TRANSMISSION_URL := http://titan.local:9091/transmission/rpc
+TRANSMISSION_USER := transmission
+TRANSMISSION_PASS := transmission
+JELLYFIN_URL := http://titan.local:8096
+JELLYFIN_USER := jellyfin
+JELLYFIN_PASS := jellyfin
+MIN_SEEDERS := 2
 
-.PHONY: help bootstrap packages chrome configure launcher autostart doctor run clean uninstall remote remote-install remote-service
+.PHONY: help bootstrap packages chrome configure launcher autostart doctor run clean uninstall remote remote-install remote-service fetch fetch-install fetch-service
 
 help:
 	@echo "Targets:"
@@ -26,6 +35,9 @@ help:
 	@echo "  make remote-install - install Mote dev remote deps"
 	@echo "  make remote      - start Mote dev remote (port 8880)"
 	@echo "  make remote-service - install Mote as a systemd user service"
+	@echo "  make fetch-install - install Fetch app deps"
+	@echo "  make fetch       - start Fetch torrent search app (port 8881)"
+	@echo "  make fetch-service - install Fetch as a systemd user service"
 	@echo "  make clean       - remove generated temp files"
 	@echo "  make uninstall   - remove installed repo-managed files"
 
@@ -69,6 +81,33 @@ remote:
 
 remote-service:
 	REMOTE_DIR="$(REMOTE_DIR)" MOTE_PORT="$(MOTE_PORT)" bash scripts/install-remote-service.sh
+
+fetch-install:
+	cd "$(FETCH_DIR)" && npm install
+
+fetch:
+	cd "$(FETCH_DIR)" && \
+	FETCH_PORT="$(FETCH_PORT)" \
+	TRANSMISSION_URL="$(TRANSMISSION_URL)" \
+	TRANSMISSION_USER="$(TRANSMISSION_USER)" \
+	TRANSMISSION_PASS="$(TRANSMISSION_PASS)" \
+	JELLYFIN_URL="$(JELLYFIN_URL)" \
+	JELLYFIN_USER="$(JELLYFIN_USER)" \
+	JELLYFIN_PASS="$(JELLYFIN_PASS)" \
+	MIN_SEEDERS="$(MIN_SEEDERS)" \
+	node server.js
+
+fetch-service:
+	FETCH_DIR="$(FETCH_DIR)" \
+	FETCH_PORT="$(FETCH_PORT)" \
+	TRANSMISSION_URL="$(TRANSMISSION_URL)" \
+	TRANSMISSION_USER="$(TRANSMISSION_USER)" \
+	TRANSMISSION_PASS="$(TRANSMISSION_PASS)" \
+	JELLYFIN_URL="$(JELLYFIN_URL)" \
+	JELLYFIN_USER="$(JELLYFIN_USER)" \
+	JELLYFIN_PASS="$(JELLYFIN_PASS)" \
+	MIN_SEEDERS="$(MIN_SEEDERS)" \
+	bash scripts/install-fetch-service.sh
 
 clean:
 	rm -rf .tmp

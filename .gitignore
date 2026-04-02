@@ -2,3 +2,5 @@
 state/*
 !state/.gitkeep
 remote/node_modules/
+apps/fetch/node_modules/
+apps/fetch/fetch.db
