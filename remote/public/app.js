@@ -21,6 +21,40 @@ const PHRASES = {
   peek:        ['...', 'Hmm?', 'What\'s over there?', '*looks around*'],
   sneeze:      ['ACHOO!', 'Bless me!', '*sniff*', 'Excuse me!'],
   dance:       ['*groove*', 'Feel the beat!', 'Boogie!', 'Dance time!'],
+  hiccup:      ['*hic*', '*hic* oops', 'Excuse— *hic*'],
+  blush:       ['Oh stop it...', 'Aww shucks!', '*blushes*', 'Tee hee!'],
+  sparkle:     ['Oooh shiny!', 'Sparkle sparkle!', 'So pretty!', '✨'],
+  fullspin:    ['Wheee!', 'Again again!', 'So fun!', 'Round and round!'],
+  melt:        ['I\'m melting...', 'So warm...', 'Puddle mode...', 'Goopy...'],
+  gulp:        ['*gulp*', 'Uh oh...', 'That\'s scary...', 'Eep!'],
+  giggle:      ['Hehehe!', 'Tee hee!', 'Haha!', '*giggles*'],
+  wink:        [';)', '*wink*', 'You know it!', 'Gotcha!'],
+  suspicious:  ['Hmm...', 'Something\'s up...', 'I\'m watching...', '...sus'],
+  shocked:     ['WHAT?!', 'No way!', 'Oh no!', 'GASP!'],
+  proud:       ['Nailed it!', 'I\'m so good!', 'Champion!', 'Look at me!'],
+  whistle:     ['*whistle*', 'La dee da...', '♪ ♫', 'Doo doo doo...'],
+  nod:         ['Yeah!', 'Mm-hmm!', 'Got it!', 'Yep!'],
+  headshake:   ['Nope!', 'Nuh-uh', 'No way!', 'Not today!'],
+  stretch:     ['*streeetch*', 'Ahh!', 'That\'s better!', 'Big stretch!'],
+  sing:        ['La la laaa~', '��� do re mi ♫', 'Sing along!', '♫♪♫'],
+  shiver:      ['Brrr!', 'So cold!', '*shivers*', 'Chilly!'],
+  zoom:        ['ZOOM!', 'Fast!', 'Nyoooom!', 'Speed!'],
+  bonk:        ['Ow!', 'Bonk!', '*thud*', 'Ouch!'],
+  startle:     ['EEK!', 'What was that?!', 'Yikes!', 'AH!'],
+  shh:         ['Shhh...', 'Quiet now...', '*whispers*', 'Hush...'],
+  'look-up':   ['What\'s up there?', 'Looking up!', 'Sky check!'],
+  duck:        ['Duck!', 'Going low!', '*ducks*', 'Eep!'],
+  'lean-left': ['This way!', 'Left!', 'Over here!'],
+  'lean-right':['That way!', 'Right!', 'Over there!'],
+  slam:        ['SLAM!', 'POW!', 'Take that!', 'SMASH!'],
+  fistbump:    ['Yeah!', 'Boom!', 'Nailed it!', '👊'],
+  dodge:       ['Whoa!', 'Close one!', '*dodges*', 'Phew!'],
+  cozy:        ['Home sweet home!', 'Cozy!', 'Ahh, home...', 'Safe and sound!'],
+  hush:        ['🤫', '*muffled*', '...', 'Shhh!'],
+  crackknuckles: ['Let\'s type!', '*crack*', 'Ready!', 'Bring it on!'],
+  relief:      ['Phew!', 'Done typing!', 'Ahh...', '*stretches*'],
+  rocket:      ['LIFTOFF!', '🚀', 'To the moon!', 'UP UP UP!'],
+  floormelt:   ['I\'m a puddle...', 'So flat...', '*melts*', 'Floor time...'],
   idle:        ['Hi! I\'m Mote!', 'Waiting for you!', 'Press something!'],
 };
 
@@ -37,6 +71,40 @@ const MOOD_DURATIONS = {
   dance: 2000,
   love: 2500,
   excited: 2000,
+  hiccup: 1200,
+  blush: 2500,
+  sparkle: 1500,
+  fullspin: 1200,
+  melt: 2000,
+  gulp: 1200,
+  giggle: 2000,
+  wink: 2000,
+  suspicious: 2500,
+  shocked: 1800,
+  proud: 2500,
+  whistle: 2500,
+  nod: 1200,
+  headshake: 1200,
+  stretch: 1500,
+  sing: 3000,
+  shiver: 1500,
+  shh: 1500,
+  'look-up': 1000,
+  duck: 1000,
+  'lean-left': 1000,
+  'lean-right': 1000,
+  slam: 1200,
+  fistbump: 1200,
+  dodge: 1200,
+  cozy: 2500,
+  hush: 2000,
+  crackknuckles: 1500,
+  relief: 1500,
+  rocket: 1500,
+  floormelt: 1500,
+  zoom: 1000,
+  bonk: 1500,
+  startle: 1200,
 };
 
 function setMote(mood, phrase) {
@@ -75,8 +143,100 @@ function trackButtonPress() {
 
 // --- API calls ---
 
+// --- Success streak tracking (triggers proud) ---
+let successStreak = 0;
+
+// --- Direction combo detection ---
+let recentDirs = [];
+let dirResetTimer = null;
+
+function trackDirection(dir) {
+  recentDirs.push(dir);
+  clearTimeout(dirResetTimer);
+  dirResetTimer = setTimeout(() => { recentDirs = []; }, 2000);
+
+  // Keep last 5
+  if (recentDirs.length > 5) recentDirs.shift();
+
+  const last3 = recentDirs.slice(-3);
+  const last4 = recentDirs.slice(-4);
+
+  // Left-right-left or right-left-right = confused
+  if (last3.length === 3 &&
+      ((last3[0] === 'left' && last3[1] === 'right' && last3[2] === 'left') ||
+       (last3[0] === 'right' && last3[1] === 'left' && last3[2] === 'right'))) {
+    recentDirs = [];
+    setMote('dizzy');
+    return true;
+  }
+
+  // Up-up-up-up = rocket
+  if (last4.length === 4 && last4.every(d => d === 'up')) {
+    recentDirs = [];
+    setMote('rocket');
+    return true;
+  }
+
+  // Down-down-down-down = floor melt
+  if (last4.length === 4 && last4.every(d => d === 'down')) {
+    recentDirs = [];
+    setMote('floormelt');
+    return true;
+  }
+
+  return false;
+}
+
+// Pick a mood for a d-pad direction press
+function pickDpadMood(action) {
+  const r = Math.random();
+  switch (action) {
+    case 'up':    return r < 0.25 ? 'look-up' : 'zap';
+    case 'down':  return r < 0.25 ? 'duck' : 'zap';
+    case 'left':  return r < 0.25 ? 'lean-left' : 'zap';
+    case 'right': return r < 0.25 ? 'lean-right' : 'zap';
+    default: return 'zap';
+  }
+}
+
+// Pick a mood for OK
+function pickOkMood() {
+  const r = Math.random();
+  if (r < 0.1) return 'slam';
+  if (r < 0.2) return 'fistbump';
+  if (r < 0.35) return 'nod';
+  return 'zap';
+}
+
+// Pick a mood for Back
+function pickBackMood() {
+  const r = Math.random();
+  if (r < 0.15) return 'dodge';
+  if (r < 0.3) return 'headshake';
+  return 'zap';
+}
+
+// Pick a mood for Home
+function pickHomeMood() {
+  const r = Math.random();
+  if (r < 0.25) return 'cozy';
+  if (r < 0.4) return 'sparkle';
+  return 'zap';
+}
+
+// Pick a mood for Reload
+function pickReloadMood() {
+  return Math.random() < 0.35 ? 'zoom' : 'zap';
+}
+
 async function sendAction(action) {
   const spammed = trackButtonPress();
+
+  // Check direction combos
+  if (['up', 'down', 'left', 'right'].includes(action)) {
+    if (trackDirection(action)) return; // combo fired, skip normal send
+  }
+
   try {
     const res = await fetch('/api/action', {
       method: 'POST',
@@ -86,13 +246,31 @@ async function sendAction(action) {
     const data = await res.json();
     if (!spammed) {
       if (data.ok) {
-        setMote(data.mote || 'zap');
+        successStreak++;
+        if (successStreak === 15) {
+          successStreak = 0;
+          setMote('proud');
+        } else if (['up','down','left','right'].includes(action)) {
+          setMote(pickDpadMood(action));
+        } else if (action === 'ok') {
+          setMote(pickOkMood());
+        } else if (action === 'back') {
+          setMote(pickBackMood());
+        } else if (action === 'home') {
+          setMote(pickHomeMood());
+        } else if (action === 'reload') {
+          setMote(pickReloadMood());
+        } else {
+          setMote(data.mote || 'zap');
+        }
       } else {
-        setMote(data.mote || 'confused', data.error);
+        successStreak = 0;
+        setMote(Math.random() < 0.3 ? 'gulp' : (data.mote || 'confused'), data.error);
       }
     }
   } catch {
-    setMote('sad', 'Can\'t reach HTPC...');
+    successStreak = 0;
+    setMote(Math.random() < 0.4 ? 'shocked' : 'sad', 'Can\'t reach HTPC...');
   }
 }
 
@@ -107,8 +285,9 @@ async function sendVolume(action) {
     const data = await res.json();
     if (!spammed) {
       if (data.ok) {
-        // Dance when adjusting volume (not mute)
-        setMote(action === 'mute' ? 'zap' : 'dance');
+        if (action === 'mute') setMote('hush');
+        else if (action === 'up') setMote('dance');
+        else setMote('shh');
       } else {
         setMote(data.mote || 'confused', data.error);
       }
@@ -218,12 +397,14 @@ function activateKeyboard() {
   keyboardInput.focus();
   keyboardInput.setSelectionRange(1, 1);
   connectWS();
+  setMote('crackknuckles');
 }
 
 function deactivateKeyboard() {
   keyboardMode = false;
   btnKeyboard.classList.remove('active');
   keyboardInput.blur();
+  setMote('relief');
 }
 
 btnKeyboard.addEventListener('click', () => {
@@ -429,7 +610,7 @@ function scheduleSleepy() {
 
 scheduleSleepy();
 
-// --- Love (Easter egg: tap Mote 5 times) ---
+// --- Love (Easter egg: tap Mote 5 times) / Blush (3 taps) ---
 
 let moteTaps = 0;
 let moteTapTimer = null;
@@ -441,24 +622,125 @@ moteEl.addEventListener('click', () => {
   if (moteTaps >= 5) {
     moteTaps = 0;
     setMote('love');
+  } else if (moteTaps === 3) {
+    setMote('blush');
   }
 });
+
+// --- Fullspin (Easter egg: long-press Mote) ---
+
+let motePressTimer = null;
+moteEl.addEventListener('pointerdown', () => {
+  motePressTimer = setTimeout(() => setMote('fullspin'), 800);
+});
+moteEl.addEventListener('pointerup', () => clearTimeout(motePressTimer));
+moteEl.addEventListener('pointerleave', () => clearTimeout(motePressTimer));
 
 // --- Initial mood: wave hello ---
 setMote('wave');
 
-// --- Excited on reconnect after disconnect ---
+// --- Excited on reconnect / shocked+shiver on disconnect ---
 
 let wasDisconnected = false;
 
 const origCheckHealth = checkHealth;
 checkHealth = async function () {
-  const prevStatus = statusDot.className;
   await origCheckHealth();
   const nowOk = statusDot.className.includes('ok');
   if (wasDisconnected && nowOk) {
     setMote('excited');
     wasDisconnected = false;
   }
-  if (!nowOk) wasDisconnected = true;
+  if (!nowOk && !wasDisconnected) {
+    setMote('shocked');
+    wasDisconnected = true;
+  }
+};
+
+// --- Random idle animations ---
+
+const IDLE_ANIMATIONS = [
+  { mood: 'giggle',     weight: 3 },
+  { mood: 'wink',       weight: 3 },
+  { mood: 'suspicious', weight: 2 },
+  { mood: 'whistle',    weight: 2 },
+  { mood: 'sing',       weight: 2 },
+  { mood: 'hiccup',     weight: 1 },
+  { mood: 'startle',    weight: 1 },
+  { mood: 'melt',       weight: 1 },
+];
+
+const IDLE_TOTAL_WEIGHT = IDLE_ANIMATIONS.reduce((s, a) => s + a.weight, 0);
+
+function pickWeightedIdle() {
+  let r = Math.random() * IDLE_TOTAL_WEIGHT;
+  for (const a of IDLE_ANIMATIONS) {
+    r -= a.weight;
+    if (r <= 0) return a.mood;
+  }
+  return IDLE_ANIMATIONS[0].mood;
+}
+
+function scheduleIdleAnimation() {
+  const delay = 20000 + Math.random() * 30000; // 20-50s
+  setTimeout(() => {
+    if (isIdle()) {
+      setMote(pickWeightedIdle());
+    }
+    scheduleIdleAnimation();
+  }, delay);
+}
+
+scheduleIdleAnimation();
+
+// --- Shiver on degraded connection ---
+
+const origCheckHealth2 = checkHealth;
+checkHealth = async function () {
+  await origCheckHealth2();
+  if (statusText.textContent === 'degraded' && isIdle()) {
+    setMote('shiver');
+  }
+};
+
+// --- Stretch after waking from sleep ---
+
+const origSetMote = setMote;
+let wasSleepy = false;
+
+// Can't easily wrap setMote, so track sleepy state via a mutation observer approach
+setInterval(() => {
+  const isSleepy = moteEl.classList.contains('sleepy');
+  if (wasSleepy && !isSleepy && isIdle()) {
+    // Just woke up — stretch!
+    setTimeout(() => {
+      if (isIdle()) setMote('stretch');
+    }, 500);
+  }
+  wasSleepy = isSleepy;
+}, 500);
+
+// --- Bonk on repeated errors ---
+
+let errorCount = 0;
+let errorResetTimer = null;
+
+const origFetch = window.fetch;
+window.fetch = async function (...args) {
+  const res = await origFetch.apply(this, args);
+  if (typeof args[0] === 'string' && args[0].startsWith('/api/')) {
+    const clone = res.clone();
+    clone.json().then(data => {
+      if (data && data.ok === false) {
+        errorCount++;
+        clearTimeout(errorResetTimer);
+        errorResetTimer = setTimeout(() => { errorCount = 0; }, 5000);
+        if (errorCount >= 3) {
+          errorCount = 0;
+          setMote('bonk');
+        }
+      }
+    }).catch(() => {});
+  }
+  return res;
 };

@@ -88,6 +88,40 @@ body {
 .mote.peek { animation: none; }
 .mote.sneeze { animation: mote-sneeze 0.5s ease; }
 .mote.dance { animation: mote-dance 0.6s ease; }
+.mote.hiccup { animation: mote-hiccup 0.3s ease 3; }
+.mote.blush { animation: mote-pulse-love 0.6s ease; }
+.mote.sparkle { animation: mote-zap 0.3s ease 2; }
+.mote.fullspin { animation: mote-fullspin 0.6s ease; }
+.mote.melt { animation: mote-melt 1.5s ease; }
+.mote.gulp { animation: mote-gulp 0.4s ease; }
+.mote.giggle { animation: mote-giggle 0.6s ease; }
+.mote.wink { animation: none; }
+.mote.suspicious { animation: none; }
+.mote.shocked { animation: mote-shocked 0.3s ease; }
+.mote.proud { animation: mote-proud 0.8s ease; }
+.mote.whistle { animation: mote-sway 1.5s ease-in-out; }
+.mote.nod { animation: mote-nod 0.5s ease; }
+.mote.headshake { animation: mote-headshake 0.4s ease; }
+.mote.stretch { animation: mote-stretch 0.8s ease; }
+.mote.sing { animation: mote-sway 1s ease-in-out; }
+.mote.shiver { animation: mote-shiver 0.5s linear 2; }
+.mote.zoom { animation: mote-zoom 0.4s ease; }
+.mote.bonk { animation: mote-bonk 0.5s ease; }
+.mote.startle { animation: mote-startle 0.35s ease; }
+.mote.shh { animation: mote-shrink 0.5s ease; }
+.mote.look-up { animation: mote-lean-back 0.4s ease; }
+.mote.duck { animation: mote-duck 0.35s ease; }
+.mote.lean-left { animation: mote-lean-left 0.35s ease; }
+.mote.lean-right { animation: mote-lean-right 0.35s ease; }
+.mote.slam { animation: mote-slam 0.4s ease; }
+.mote.fistbump { animation: mote-fistbump 0.35s ease; }
+.mote.dodge { animation: mote-dodge 0.35s ease; }
+.mote.cozy { animation: mote-cozy 0.8s ease; }
+.mote.hush { animation: mote-shrink 0.4s ease; }
+.mote.crackknuckles { animation: mote-crackknuckles 0.5s ease; }
+.mote.relief { animation: mote-stretch 0.6s ease; }
+.mote.rocket { animation: mote-rocket 0.6s ease; }
+.mote.floormelt { animation: mote-floormelt 0.6s ease; }
 
 @keyframes mote-bounce {
   0%, 100% { transform: translateY(0); }
@@ -168,6 +202,187 @@ body {
   40% { transform: translateX(0.4rem) rotate(5deg); }
   60% { transform: translateX(-0.3rem) rotate(-3deg); }
   80% { transform: translateX(0.3rem) rotate(3deg); }
+}
+
+@keyframes mote-hiccup {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.35rem); }
+}
+
+@keyframes mote-fullspin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes mote-melt {
+  0%, 100% { transform: scaleX(1) scaleY(1); }
+  40%, 60% { transform: scaleX(1.15) scaleY(0.8); }
+}
+
+@keyframes mote-gulp {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(0.85); }
+  60% { transform: scale(1.08); }
+}
+
+@keyframes mote-giggle {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  15% { transform: translateY(-0.2rem) rotate(2deg); }
+  30% { transform: translateY(0) rotate(-2deg); }
+  45% { transform: translateY(-0.15rem) rotate(1deg); }
+  60% { transform: translateY(0) rotate(-1deg); }
+}
+
+@keyframes mote-shocked {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+@keyframes mote-proud {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-0.3rem) scale(1.1); }
+}
+
+@keyframes mote-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(3deg); }
+  75% { transform: rotate(-3deg); }
+}
+
+@keyframes mote-nod {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(0.2rem); }
+  50% { transform: translateY(0); }
+  75% { transform: translateY(0.15rem); }
+}
+
+@keyframes mote-headshake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-0.25rem); }
+  40% { transform: translateX(0.25rem); }
+  60% { transform: translateX(-0.15rem); }
+  80% { transform: translateX(0.15rem); }
+}
+
+@keyframes mote-stretch {
+  0%, 100% { transform: scaleX(1) scaleY(1); }
+  30% { transform: scaleX(0.9) scaleY(1.15); }
+  60% { transform: scaleX(1.05) scaleY(0.95); }
+}
+
+@keyframes mote-shiver {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-0.08rem); }
+  20% { transform: translateX(0.08rem); }
+  30% { transform: translateX(-0.06rem); }
+  40% { transform: translateX(0.06rem); }
+  50% { transform: translateX(-0.08rem); }
+  60% { transform: translateX(0.08rem); }
+  70% { transform: translateX(-0.06rem); }
+  80% { transform: translateX(0.06rem); }
+  90% { transform: translateX(-0.04rem); }
+}
+
+@keyframes mote-zoom {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+@keyframes mote-bonk {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  30% { transform: translateY(0.4rem) rotate(-3deg); }
+  50% { transform: translateY(-0.3rem) rotate(2deg); }
+  70% { transform: translateY(0.1rem) rotate(-1deg); }
+}
+
+@keyframes mote-startle {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-0.6rem) scale(1.08); }
+  60% { transform: translateY(0.05rem) scale(0.98); }
+}
+
+@keyframes mote-shrink {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.9); }
+}
+
+@keyframes mote-lean-back {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50% { transform: rotate(-3deg) translateY(-0.2rem); }
+}
+
+@keyframes mote-duck {
+  0%, 100% { transform: scaleY(1) translateY(0); }
+  50% { transform: scaleY(0.8) translateY(0.15rem); }
+}
+
+@keyframes mote-lean-left {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(-0.3rem) rotate(-4deg); }
+}
+
+@keyframes mote-lean-right {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(0.3rem) rotate(4deg); }
+}
+
+@keyframes mote-slam {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  40% { transform: translateY(-0.4rem) scaleY(1.05); }
+  60% { transform: translateY(0.15rem) scaleY(0.85); }
+}
+
+@keyframes mote-fistbump {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.15); }
+  70% { transform: scale(0.95); }
+}
+
+@keyframes mote-dodge {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  40% { transform: translateX(0.4rem) rotate(5deg); }
+  70% { transform: translateX(0.15rem) rotate(2deg); }
+}
+
+@keyframes mote-cozy {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(0.1rem) scale(0.95); }
+  60%, 80% { transform: translateY(0.05rem) scale(0.97); }
+}
+
+@keyframes mote-crackknuckles {
+  0%, 100% { transform: scale(1) rotate(0); }
+  20% { transform: scale(1.05) rotate(-2deg); }
+  40% { transform: scale(1.05) rotate(2deg); }
+  60% { transform: scale(1.08) rotate(0); }
+}
+
+@keyframes mote-rocket {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-1rem) scale(1.1); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes mote-floormelt {
+  0%, 100% { transform: scaleX(1) scaleY(1) translateY(0); }
+  50% { transform: scaleX(1.3) scaleY(0.6) translateY(0.3rem); }
+}
+
+/* --- Shh --- */
+.mote.shh .mote-eye {
+  height: 0.3rem;
+  border-radius: 0.3rem 0.3rem 0 0;
+  transform: translateY(-0.05rem);
+}
+.mote.shh .mote-mouth {
+  width: 0.12rem; height: 0.4rem;
+  border-radius: 0.2rem;
+  background: var(--text);
+}
+.mote.shh .mote-antenna-ball {
+  opacity: 0.4;
+  box-shadow: none;
 }
 
 .mote-antenna {
@@ -473,6 +688,383 @@ body {
 
 .mote.dance .mote-antenna-ball {
   animation: antenna-pulse 0.3s ease-in-out infinite;
+}
+
+/* --- Hiccup --- */
+.mote.hiccup .mote-eye { width: 0.5rem; height: 0.6rem; }
+.mote.hiccup .mote-mouth {
+  width: 0.35rem; height: 0.35rem; border-radius: 50%;
+  background: var(--accent);
+}
+
+/* --- Blush --- */
+.mote.blush .mote-eye {
+  height: 0.3rem; border-radius: 0.3rem 0.3rem 0 0;
+  transform: translateY(-0.05rem);
+}
+.mote.blush .mote-mouth {
+  width: 0.6rem; height: 0.2rem;
+  border-radius: 0 0 0.4rem 0.4rem; background: #ff8fa0;
+}
+.mote-body {
+  position: relative;
+}
+.mote-body::before,
+.mote-body::after {
+  content: '';
+  position: absolute;
+  width: 0.7rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgba(255, 120, 150, 0);
+  top: 55%;
+  transition: background 0.3s;
+  pointer-events: none;
+}
+.mote-body::before { left: 0.15rem; }
+.mote-body::after { right: 0.15rem; }
+.mote.blush .mote-body::before,
+.mote.blush .mote-body::after {
+  background: rgba(255, 120, 150, 0.45);
+}
+
+/* --- Sparkle --- */
+.mote.sparkle .mote-eye {
+  background: var(--home-color);
+  box-shadow: 0 0 0.4rem rgba(255, 184, 77, 0.5);
+}
+.mote.sparkle .mote-antenna-ball {
+  background: #fff;
+  box-shadow: 0 0 1rem rgba(255, 255, 255, 0.8), 0 0 2rem var(--accent-glow);
+}
+.mote.sparkle .mote-mouth {
+  width: 0.7rem; height: 0.25rem;
+  border-radius: 0 0 0.5rem 0.5rem; background: var(--ok-color);
+}
+
+/* --- Full spin --- */
+.mote.fullspin .mote-eye {
+  height: 0.3rem; border-radius: 0.3rem 0.3rem 0 0;
+}
+.mote.fullspin .mote-mouth {
+  width: 0.8rem; height: 0.4rem;
+  border-radius: 0 0 0.5rem 0.5rem; background: var(--ok-color);
+}
+
+/* --- Melt --- */
+.mote.melt .mote-eye {
+  height: 0.5rem; border-radius: 0 0 0.3rem 0.3rem;
+  transform: translateY(0.05rem);
+}
+.mote.melt .mote-mouth {
+  width: 0.6rem; height: 0.15rem; border-radius: 0.3rem;
+  background: var(--text-muted);
+}
+
+/* --- Gulp --- */
+.mote.gulp .mote-eye { width: 0.6rem; height: 0.7rem; }
+.mote.gulp .mote-mouth {
+  width: 0.25rem; height: 0.25rem; border-radius: 50%;
+  background: var(--text-muted);
+}
+
+/* --- Giggle --- */
+.mote.giggle .mote-eye {
+  height: 0.25rem; border-radius: 0.3rem 0.3rem 0 0;
+  transform: translateY(-0.05rem);
+}
+.mote.giggle .mote-mouth {
+  width: 0.7rem; height: 0.3rem;
+  border-radius: 0 0 0.5rem 0.5rem; background: var(--ok-color);
+}
+
+/* --- Wink (right eye closes) --- */
+.mote.wink .mote-eye.right {
+  height: 0.12rem; border-radius: 0.3rem;
+  transform: translateY(0.1rem);
+}
+.mote.wink .mote-mouth {
+  width: 0.5rem; height: 0.18rem;
+  border-radius: 0 0 0.4rem 0.1rem;
+  transform: translateX(-35%);
+}
+
+/* --- Suspicious --- */
+.mote.suspicious .mote-eye {
+  height: 0.25rem; border-radius: 0.3rem;
+  transform: translateY(0.05rem);
+}
+.mote.suspicious .mote-eye.left { transform: translateX(0.1rem) translateY(0.05rem); }
+.mote.suspicious .mote-eye.right { transform: translateX(0.1rem) translateY(0.05rem); }
+.mote.suspicious .mote-mouth {
+  width: 0.35rem; height: 0.12rem; border-radius: 0.3rem;
+  background: var(--text-muted);
+}
+
+/* --- Shocked --- */
+.mote.shocked .mote-eye {
+  width: 0.7rem; height: 0.75rem;
+  background: var(--text);
+}
+.mote.shocked .mote-mouth {
+  width: 0.5rem; height: 0.45rem; border-radius: 50%;
+  background: var(--back-color);
+}
+
+/* --- Proud --- */
+.mote.proud .mote-eye {
+  height: 0.3rem; border-radius: 0.3rem 0.3rem 0 0;
+  transform: translateY(-0.08rem);
+}
+.mote.proud .mote-mouth {
+  width: 0.8rem; height: 0.3rem;
+  border-radius: 0 0 0.5rem 0.5rem; background: var(--ok-color);
+}
+.mote.proud .mote-antenna-ball {
+  background: var(--ok-color);
+  box-shadow: 0 0 1rem rgba(92, 224, 160, 0.6);
+}
+
+/* --- Whistle --- */
+.mote.whistle .mote-eye {
+  transform: translateY(-0.1rem);
+}
+.mote.whistle .mote-mouth {
+  width: 0.28rem; height: 0.28rem; border-radius: 50%;
+  background: var(--reload-color);
+}
+
+/* --- Nod --- */
+.mote.nod .mote-eye {
+  height: 0.3rem; border-radius: 0.3rem 0.3rem 0 0;
+}
+.mote.nod .mote-mouth {
+  width: 0.6rem; height: 0.2rem;
+  border-radius: 0 0 0.4rem 0.4rem; background: var(--ok-color);
+}
+
+/* --- Headshake --- */
+.mote.headshake .mote-eye {
+  height: 0.5rem;
+}
+.mote.headshake .mote-mouth {
+  width: 0.45rem; height: 0.12rem; border-radius: 0.3rem;
+  background: var(--text-muted);
+}
+
+/* --- Stretch --- */
+.mote.stretch .mote-eye {
+  height: 0.4rem;
+  transform: translateY(-0.05rem);
+}
+.mote.stretch .mote-mouth {
+  width: 0.5rem; height: 0.4rem; border-radius: 50%;
+  background: var(--accent);
+}
+
+/* --- Sing --- */
+.mote.sing .mote-eye {
+  height: 0.3rem; border-radius: 0.3rem 0.3rem 0 0;
+  transform: translateY(-0.05rem);
+}
+.mote.sing .mote-mouth {
+  width: 0.35rem; height: 0.3rem; border-radius: 50%;
+  background: var(--reload-color);
+  animation: sing-mouth 0.4s ease-in-out infinite alternate;
+}
+@keyframes sing-mouth {
+  0% { transform: translateX(-50%) scale(1); }
+  100% { transform: translateX(-50%) scale(0.7, 1.3); }
+}
+
+/* --- Shiver --- */
+.mote.shiver .mote-eye {
+  width: 0.5rem; height: 0.6rem;
+}
+.mote.shiver .mote-mouth {
+  width: 0.5rem; height: 0.15rem; border-radius: 0.3rem;
+  background: var(--reload-color);
+}
+
+/* --- Zoom --- */
+.mote.zoom .mote-eye {
+  width: 0.6rem; height: 0.7rem;
+  background: var(--reload-color);
+  box-shadow: 0 0 0.3rem rgba(108, 196, 255, 0.4);
+}
+.mote.zoom .mote-mouth {
+  width: 0.4rem; height: 0.4rem; border-radius: 50%;
+  background: var(--home-color);
+}
+
+/* --- Bonk --- */
+.mote.bonk .mote-eye {
+  width: 0.55rem; height: 0.55rem;
+  background: transparent; border: 0.12rem solid var(--text);
+  border-radius: 50%;
+}
+.mote.bonk .mote-mouth {
+  width: 0.5rem; height: 0.2rem; border-radius: 0.3rem;
+  background: var(--back-color);
+}
+
+/* --- Startle --- */
+.mote.startle .mote-eye {
+  width: 0.65rem; height: 0.7rem;
+}
+.mote.startle .mote-mouth {
+  width: 0.4rem; height: 0.35rem; border-radius: 50%;
+  background: var(--home-color);
+}
+.mote.startle .mote-antenna-ball {
+  background: #fff;
+  box-shadow: 0 0 0.8rem rgba(255, 255, 255, 0.6);
+}
+
+/* --- Look up (d-pad up) --- */
+.mote.look-up .mote-eye {
+  transform: translateY(-0.12rem);
+}
+.mote.look-up .mote-mouth {
+  width: 0.3rem; height: 0.25rem; border-radius: 50%;
+  background: var(--accent);
+}
+
+/* --- Duck (d-pad down) --- */
+.mote.duck .mote-eye {
+  height: 0.2rem; border-radius: 0.3rem;
+  transform: translateY(0.05rem);
+}
+.mote.duck .mote-mouth {
+  width: 0.5rem; height: 0.12rem; border-radius: 0.3rem;
+  background: var(--text-muted);
+}
+
+/* --- Lean left --- */
+.mote.lean-left .mote-eye.left,
+.mote.lean-left .mote-eye.right {
+  transform: translateX(-0.12rem);
+}
+.mote.lean-left .mote-mouth {
+  width: 0.5rem; height: 0.18rem;
+  border-radius: 0 0 0.4rem 0.4rem; background: var(--accent);
+}
+
+/* --- Lean right --- */
+.mote.lean-right .mote-eye.left,
+.mote.lean-right .mote-eye.right {
+  transform: translateX(0.12rem);
+}
+.mote.lean-right .mote-mouth {
+  width: 0.5rem; height: 0.18rem;
+  border-radius: 0 0 0.4rem 0.4rem; background: var(--accent);
+}
+
+/* --- Slam (OK) --- */
+.mote.slam .mote-eye {
+  height: 0.25rem; border-radius: 0.3rem;
+}
+.mote.slam .mote-mouth {
+  width: 0.7rem; height: 0.15rem; border-radius: 0.3rem;
+  background: var(--ok-color);
+}
+
+/* --- Fistbump (OK) --- */
+.mote.fistbump .mote-eye {
+  height: 0.3rem; border-radius: 0.3rem 0.3rem 0 0;
+  transform: translateY(-0.05rem);
+}
+.mote.fistbump .mote-mouth {
+  width: 0.7rem; height: 0.3rem;
+  border-radius: 0 0 0.5rem 0.5rem; background: var(--ok-color);
+}
+.mote.fistbump .mote-antenna-ball {
+  background: var(--ok-color);
+  box-shadow: 0 0 0.8rem rgba(92, 224, 160, 0.5);
+}
+
+/* --- Dodge (back) --- */
+.mote.dodge .mote-eye {
+  width: 0.6rem; height: 0.65rem;
+}
+.mote.dodge .mote-mouth {
+  width: 0.35rem; height: 0.3rem; border-radius: 50%;
+  background: var(--back-color);
+}
+
+/* --- Cozy (home) --- */
+.mote.cozy .mote-eye {
+  height: 0.2rem; border-radius: 0.3rem 0.3rem 0 0;
+  transform: translateY(-0.05rem);
+}
+.mote.cozy .mote-mouth {
+  width: 0.7rem; height: 0.25rem;
+  border-radius: 0 0 0.5rem 0.5rem; background: var(--home-color);
+}
+.mote.cozy .mote-antenna-ball {
+  background: var(--home-color);
+  box-shadow: 0 0 0.8rem rgba(255, 184, 77, 0.5);
+}
+
+/* --- Hush (mute) --- */
+.mote.hush .mote-eye {
+  width: 0.6rem; height: 0.65rem;
+}
+.mote.hush .mote-mouth {
+  width: 0.12rem; height: 0.35rem; border-radius: 0.2rem;
+  background: var(--text);
+}
+.mote.hush .mote-antenna-ball {
+  opacity: 0.3; box-shadow: none;
+}
+
+/* --- Crack knuckles (keyboard on) --- */
+.mote.crackknuckles .mote-eye {
+  height: 0.3rem; border-radius: 0.3rem;
+  transform: translateY(0.03rem);
+}
+.mote.crackknuckles .mote-mouth {
+  width: 0.6rem; height: 0.2rem;
+  border-radius: 0 0 0.4rem 0.4rem; background: var(--accent);
+}
+.mote.crackknuckles .mote-antenna-ball {
+  background: var(--accent);
+  box-shadow: 0 0 1rem var(--accent-glow);
+}
+
+/* --- Relief (keyboard off) --- */
+.mote.relief .mote-eye {
+  height: 0.3rem; border-radius: 0.3rem 0.3rem 0 0;
+  transform: translateY(-0.05rem);
+}
+.mote.relief .mote-mouth {
+  width: 0.5rem; height: 0.35rem; border-radius: 50%;
+  background: var(--accent);
+}
+
+/* --- Rocket (up spam) --- */
+.mote.rocket .mote-eye {
+  width: 0.6rem; height: 0.7rem;
+  background: var(--home-color);
+  box-shadow: 0 0 0.4rem rgba(255, 184, 77, 0.5);
+}
+.mote.rocket .mote-mouth {
+  width: 0.8rem; height: 0.4rem;
+  border-radius: 0 0 0.5rem 0.5rem; background: var(--ok-color);
+}
+.mote.rocket .mote-antenna-ball {
+  background: #fff;
+  box-shadow: 0 0 1.2rem rgba(255, 255, 255, 0.8);
+}
+
+/* --- Floor melt (down spam) --- */
+.mote.floormelt .mote-eye {
+  height: 0.15rem; border-radius: 0.3rem;
+  transform: translateY(0.1rem);
+}
+.mote.floormelt .mote-mouth {
+  width: 0.6rem; height: 0.15rem; border-radius: 0.3rem;
+  background: var(--text-muted);
 }
 
 .mote-speech {
