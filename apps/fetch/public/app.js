@@ -333,10 +333,12 @@
       `;
     }).join('');
 
-    // Focus first poster
+    // On TV, focus first poster. On mobile, don't auto-focus (let user touch-scroll)
     discoverFocusRow = 0;
     discoverFocusCol = 0;
-    focusDiscoverPoster(0, 0);
+    if (!isMobile) {
+      focusDiscoverPoster(0, 0);
+    }
   }
 
   function focusDiscoverPoster(row, col) {
@@ -362,13 +364,22 @@
     discoverBackdrop.classList.add('visible');
   }
 
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
   function scrollRowToFocus(rowIdx, colIdx) {
     const track = discoverRows.querySelector(`.discover-row[data-row="${rowIdx}"] .discover-row-track`);
     if (!track) return;
-    // Each poster is 8rem + 0.8rem gap = 8.8rem. Scroll so focused poster is ~2nd from left.
-    const posterWidth = 8.8 * 16; // convert rem to px (assuming 16px base)
-    const offset = Math.max(0, (colIdx - 1) * posterWidth);
-    track.style.transform = `translateX(-${offset}px)`;
+
+    if (isMobile) {
+      // On mobile, use native scroll instead of transform
+      const card = track.children[colIdx];
+      if (card) card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    } else {
+      // On TV, use transform-based scroll
+      const posterWidth = 8.8 * 16;
+      const offset = Math.max(0, (colIdx - 1) * posterWidth);
+      track.style.transform = `translateX(-${offset}px)`;
+    }
     discoverScrollOffsets[rowIdx] = colIdx;
   }
 
