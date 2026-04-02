@@ -75,6 +75,58 @@ Every script must be safe to run repeatedly. Check before installing (e.g. `comm
 
 When adding new features (new packages, new config, new web assets), update the relevant install script AND the doctor script. If a new component is added, `doctor.sh` should validate it. The deploy pipeline is: edit in repo -> `make <target>` -> deployed to target paths. Don't add things that bypass this flow.
 
+## 10-foot UI design
+
+This is a TV app viewed from a couch (~10 feet away). Every screen — the launcher, Fetch, and future apps — must follow these rules.
+
+### Sizing
+
+Everything is larger than desktop/mobile. The launcher's CSS variables are the reference:
+
+- **Body text**: minimum 1.1rem, prefer 1.2–1.5rem. Anything under 1rem is unreadable from a couch.
+- **Headings / primary labels**: 1.4–2rem.
+- **Badges / secondary text**: 0.8rem is the absolute minimum.
+- **Touch/focus targets**: minimum 3rem tall. The launcher uses 28rem tiles — list rows in apps should be at least 3.5–4rem.
+- **Spacing**: generous padding and gaps. Cramped layouts are hard to scan on TV. Use 1rem+ gaps between list items, 1.5rem+ padding inside interactive elements.
+- **Page padding**: 2–3rem margins so content doesn't crowd the screen edges (TVs have overscan).
+
+### Color and contrast
+
+- **Dark theme only**: `--bg: #0a0a0f` with a subtle radial gradient. TVs in dim rooms — dark backgrounds reduce eye strain and light bleed.
+- **Text on dark**: `--text: #f0f0f5` for primary, `--text-muted: rgba(255,255,255,0.5)` for secondary. Never use pure white (#fff) for large text areas — too harsh on TV.
+- **Surfaces**: frosted glass effect with low-opacity white (`rgba(255,255,255,0.04–0.08)`) and `backdrop-filter: blur`. Provides depth without high contrast boundaries.
+- **Accent colors**: use sparingly for badges, progress bars, active states. Current palette: `--accent: #6c8cff`, `--gold: #f0c040`, `--green: #50c878`.
+
+### Focus and navigation
+
+- **Focus ring is mandatory**: every interactive element must have a visible focus state. Use `box-shadow: 0 0 0 0.15rem var(--focus-ring)` — not `outline`, which can be clipped.
+- **Scale on focus**: subtle scale-up (1.01–1.04) makes the focused item obvious from across the room.
+- **Glow on focus**: `box-shadow` glow (e.g. `0 0 2rem var(--glow)`) adds a halo effect that reads well on TV.
+- **No hover-only states**: hover effects must also apply on `:focus`. Remote/keyboard users never hover.
+- **Cursor hidden**: TV mode hides the cursor (`cursor: none` on body). Don't rely on pointer interactions.
+
+### Navigation model
+
+- **D-pad is primary**: Up/Down to move through lists, Left/Right for tabs/toggles, Enter to select.
+- **Single focus context**: only one thing on screen should be focusable at a time per zone. Don't mix focusable elements in unexpected layouts.
+- **Home key** (KEY_HOMEPAGE) returns to the launcher. Chrome handles this natively — the homepage is the launcher. Never use Escape for "return to launcher".
+- **Escape**: use for "back within the app" (e.g. close modal, go to previous view, clear input).
+- **No Tab navigation**: Tab conflicts with Mote keyboard mode and isn't intuitive with a remote. Use Left/Right arrows for switching between views/tabs.
+
+### Shared CSS variables
+
+Apps should reuse the launcher's color palette. Copy these variables into each app's stylesheet:
+
+```css
+--bg: #0a0a0f;
+--surface: rgba(255, 255, 255, 0.04);
+--surface-hover: rgba(255, 255, 255, 0.08);
+--text: #f0f0f5;
+--text-muted: rgba(255, 255, 255, 0.5);
+--focus-ring: rgba(255, 255, 255, 0.85);
+--glow: rgba(120, 120, 255, 0.15);
+```
+
 ## Conventions
 
 - All scripts use `set -euo pipefail` and are invoked via `bash scripts/<name>.sh`
