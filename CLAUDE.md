@@ -2,7 +2,7 @@
 
 ## Project overview
 
-htpc-tv bootstraps an Ubuntu 24.04 laptop into a TV/HTPC appliance. It installs Google Chrome, configures GNOME to stay awake and unlocked, deploys a local launcher webpage, and sets Chrome to auto-launch in fullscreen on login.
+htpc-tv bootstraps an Ubuntu 24.04 laptop into a TV/HTPC appliance. It installs Google Chrome, configures GNOME to stay awake and unlocked, deploys a local launcher webpage, and sets Chrome to auto-launch in kiosk mode on login. Chrome uses a Smart TV user agent so that services like YouTube serve their TV interface.
 
 The launcher is a simple HTML/CSS/JS page with tile links to streaming apps (Jellyfin, YouTube, Netflix). Navigation supports arrow keys for remote/keyboard control.
 
@@ -16,6 +16,7 @@ scripts/              # Bash scripts invoked by Make targets
   configure-system.sh # gsettings: disable screensaver, sleep, lock
   install-launcher.sh # rsync web/ to ~/.local/share/htpc-tv/
   install-autostart.sh# Writes tv-mode.desktop to ~/.config/autostart/
+  launch-chrome.sh    # Chrome launcher with display detection and TV user agent
   doctor.sh           # Validates: Chrome, launcher, autostart, unclutter
   uninstall.sh        # Removes launcher dir and autostart file
 web/                  # Launcher webpage (served as file://)
@@ -70,6 +71,10 @@ When adding new features (new packages, new config, new web assets), update the 
 - The grid is responsive: 3 columns at 900px+, 2 at 600px+, 1 below
 - Arrow key navigation in `app.js` adapts to the column count
 - After editing, run `make launcher` to deploy changes
+
+## Remote operation (SSH)
+
+`make run` works from SSH sessions. The `launch-chrome.sh` script auto-detects the active X display by scanning `/tmp/.X11-unix/` when `$DISPLAY` is not set. Chrome must be fully killed before relaunching — if an existing Chrome process is running, new instances join it and ignore command-line flags like `--user-agent`.
 
 ## Testing
 

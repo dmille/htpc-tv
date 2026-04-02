@@ -51,7 +51,10 @@ doctor:
 	bash scripts/doctor.sh
 
 run:
-	$(CHROME_CMD) $(CHROME_FLAGS) file://$(INSTALL_DIR)/index.html
+	INSTALL_DIR="$(INSTALL_DIR)" \
+	CHROME_CMD="$(CHROME_CMD)" \
+	CHROME_FLAGS="$(CHROME_FLAGS)" \
+	bash scripts/launch-chrome.sh
 
 clean:
 	rm -rf .tmp

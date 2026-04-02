@@ -31,3 +31,13 @@ document.addEventListener('keydown', (event) => {
   event.preventDefault();
   tiles[nextIndex].focus();
 });
+
+/* Clock */
+function updateClock() {
+  const el = document.getElementById('clock');
+  if (!el) return;
+  const now = new Date();
+  el.textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+}
+updateClock();
+setInterval(updateClock, 10000);
