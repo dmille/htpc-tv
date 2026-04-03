@@ -681,6 +681,18 @@ body {
   fill: #F5C518;
 }
 
+.detail-credits {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.detail-credits-label {
+  color: var(--text);
+  font-weight: 600;
+  margin-right: 0.4rem;
+}
+
 .detail-overview {
   font-size: 1.1rem;
   line-height: 1.5;
@@ -828,6 +840,11 @@ body {
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
+}
+
+/* Utility */
+.hidden {
+  display: none !important;
 }
 
 /* Scrollbar */

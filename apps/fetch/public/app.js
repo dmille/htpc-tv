@@ -464,6 +464,9 @@
     detailPanelOpen = true;
     detailTorrent = null;
 
+    // Clean up any previously injected credits
+    document.querySelectorAll('.detail-credits').forEach(el => el.remove());
+
     // Set content
     detailPoster.src = detailItem.poster || '';
     detailTitle.textContent = detailItem.title;
@@ -497,6 +500,29 @@
       const res = await fetch(url);
       if (!res.ok) throw new Error('Search failed');
       const data = await res.json();
+
+      // Update detail info with extra metadata
+      if (data.detail) {
+        const d = data.detail;
+        const metaParts = [detailItem.year];
+        if (d.runtime) metaParts.push(`${d.runtime} min`);
+        if (d.genres && d.genres.length) metaParts.push(d.genres.slice(0, 3).join(', '));
+        detailMeta.textContent = metaParts.filter(Boolean).join(' \u2022 ');
+
+        const extraParts = [];
+        if (d.directors && d.directors.length) {
+          extraParts.push(`<div class="detail-credits"><span class="detail-credits-label">Director</span> ${escapeHtml(d.directors.join(', '))}</div>`);
+        }
+        if (d.cast && d.cast.length) {
+          extraParts.push(`<div class="detail-credits"><span class="detail-credits-label">Cast</span> ${d.cast.map(c => escapeHtml(c.name)).join(', ')}</div>`);
+        }
+        if (d.tagline) {
+          detailOverview.textContent = d.tagline + ' — ' + (detailItem.overview || '');
+        }
+        if (extraParts.length) {
+          detailRatings.insertAdjacentHTML('afterend', extraParts.join(''));
+        }
+      }
 
       if (data.available && data.torrent) {
         detailTorrent = data.torrent;

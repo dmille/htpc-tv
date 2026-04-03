@@ -186,7 +186,7 @@ app.get('/api/discover/item/:tmdbId', async (req, res) => {
   try {
     // Look up item on TMDB to get title + year
     const endpoint = type === 'tv' ? `/tv/${tmdbId}` : `/movie/${tmdbId}`;
-    const tmdbRes = await fetch(`https://api.themoviedb.org/3${endpoint}`, {
+    const tmdbRes = await fetch(`https://api.themoviedb.org/3${endpoint}?append_to_response=credits`, {
       headers: { Authorization: `Bearer ${process.env.TMDB_TOKEN}` },
     });
     if (!tmdbRes.ok) return res.status(404).json({ error: 'TMDB item not found' });
@@ -194,16 +194,38 @@ app.get('/api/discover/item/:tmdbId', async (req, res) => {
     const item = await tmdbRes.json();
     const title = item.title || item.name;
     const year = (item.release_date || item.first_air_date || '').substring(0, 4);
+    const runtime = item.runtime || (item.episode_run_time && item.episode_run_time[0]) || null;
+    const genres = (item.genres || []).map(g => g.name);
+    const tagline = item.tagline || '';
+    const directors = (item.credits?.crew || []).filter(c => c.job === 'Director').map(c => c.name);
+    const cast = (item.credits?.cast || []).slice(0, 5).map(c => ({ name: c.name, character: c.character }));
+    // For TV, use "created_by" instead of director
+    const creators = (item.created_by || []).map(c => c.name);
     // Strip special characters that break Apibay search (apostrophes, colons, etc.)
     const cleanTitle = title.replace(/[''":!,]/g, '').replace(/\s+/g, ' ').trim();
     const query = year ? `${cleanTitle} ${year}` : cleanTitle;
 
-    // Search for torrents using existing pipeline
+    // Search for torrents — try specific category first, fall back to all
     const cat = type === 'tv' ? 208 : 207;
-    const results = await search(query, cat);
+    let results = await search(query, cat);
+    if (results.length === 0) {
+      results = await search(query, 0); // fallback: search all categories
+    }
+    if (results.length === 0) {
+      // Try without year in case it's causing mismatch
+      results = await search(cleanTitle, 0);
+    }
+
+    const detail = {
+      runtime,
+      genres,
+      tagline,
+      directors: type === 'tv' ? creators : directors,
+      cast,
+    };
 
     if (results.length === 0) {
-      return res.json({ available: false, title, year });
+      return res.json({ available: false, title, year, detail });
     }
 
     const best = results[0];
@@ -211,6 +233,7 @@ app.get('/api/discover/item/:tmdbId', async (req, res) => {
       available: true,
       title,
       year,
+      detail,
       torrent: {
         name: best.name,
         magnet: best.magnet,
