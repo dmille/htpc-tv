@@ -202,7 +202,7 @@ function checkLibrary(name, type, year) {
   return series.some(s => normalizedName.includes(s.name.toLowerCase()));
 }
 
-async function search(query, category = 0) {
+async function search(query, category = 0, { lenient = false } = {}) {
   const url = `${APIBAY_URL}/q.php?q=${encodeURIComponent(query)}&cat=${category}`;
   const res = await fetch(url);
   const results = await res.json();

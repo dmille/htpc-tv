@@ -5,3 +5,5 @@ remote/node_modules/
 apps/fetch/node_modules/
 apps/fetch/fetch.db
 apps/fetch/.env
+apps/fetch/fetch.db-shm
+apps/fetch/fetch.db-wal

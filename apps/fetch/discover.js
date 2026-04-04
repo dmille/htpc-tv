@@ -85,57 +85,80 @@ function randomPage(max) {
   return Math.floor(Math.random() * max) + 1;
 }
 
-async function fetchHiddenGems() {
-  const page = randomPage(5);
-  const [movies, tv] = await Promise.all([
-    tmdbGet('/discover/movie', {
-      'sort_by': 'vote_average.desc',
-      'vote_count.gte': '200',
-      'vote_count.lte': '10000',
-      'popularity.gte': '5',
-      'popularity.lte': '40',
-      'language': 'en-US',
-      'page': page.toString(),
-    }),
-    tmdbGet('/discover/tv', {
-      'sort_by': 'vote_average.desc',
-      'vote_count.gte': '200',
-      'vote_count.lte': '10000',
-      'popularity.gte': '5',
-      'popularity.lte': '40',
-      'language': 'en-US',
-      'page': randomPage(5).toString(),
-    }),
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Fetch a blended set: mostly from top pages, some deep cuts
+async function fetchBlended(endpoint, params, { topPages = 3, deepMin = 3, deepMax = 10, topCount = 12, deepCount = 8 } = {}) {
+  const topPage = randomPage(topPages);
+  const deepPage = deepMin + randomPage(deepMax - deepMin + 1) - 1;
+
+  const [topRes, deepRes] = await Promise.all([
+    tmdbGet(endpoint, { ...params, page: topPage.toString() }),
+    tmdbGet(endpoint, { ...params, page: deepPage.toString() }),
   ]);
 
-  const items = [
-    ...movies.results.map(r => mapMovie(r)),
-    ...tv.results.map(r => mapTV(r)),
-  ];
+  const topItems = shuffle([...(topRes.results || [])]).slice(0, topCount);
+  const deepItems = shuffle([...(deepRes.results || [])]).slice(0, deepCount);
 
-  items.sort((a, b) => b.tmdbRating - a.tmdbRating);
+  // Merge, deduplicate by ID, shuffle
+  const seen = new Set();
+  const merged = [];
+  for (const item of [...topItems, ...deepItems]) {
+    if (!seen.has(item.id)) {
+      seen.add(item.id);
+      merged.push(item);
+    }
+  }
+  return shuffle(merged);
+}
+
+async function fetchHiddenGems() {
+  const movieParams = {
+    'sort_by': 'vote_average.desc',
+    'vote_count.gte': '200',
+    'vote_count.lte': '10000',
+    'popularity.gte': '5',
+    'popularity.lte': '40',
+    'language': 'en-US',
+  };
+  const tvParams = { ...movieParams };
+
+  const [movies, tv] = await Promise.all([
+    fetchBlended('/discover/movie', movieParams, { topPages: 3, deepMin: 4, deepMax: 15, topCount: 8, deepCount: 6 }),
+    fetchBlended('/discover/tv', tvParams, { topPages: 3, deepMin: 4, deepMax: 10, topCount: 6, deepCount: 4 }),
+  ]);
+
+  const items = shuffle([
+    ...movies.map(r => mapMovie(r)),
+    ...tv.map(r => mapTV(r)),
+  ]);
+
   return items.slice(0, 20);
 }
 
 async function fetchGenreGems() {
-  // Pick a genre based on current day (rotates daily)
   const dayIndex = Math.floor(Date.now() / (24 * 60 * 60 * 1000));
   const genre = GENRE_ROTATION[dayIndex % GENRE_ROTATION.length];
 
-  const data = await tmdbGet('/discover/movie', {
+  const results = await fetchBlended('/discover/movie', {
     'sort_by': 'vote_average.desc',
     'vote_count.gte': '200',
     'vote_count.lte': '10000',
     'popularity.gte': '5',
     'popularity.lte': '40',
     'with_genres': genre.id.toString(),
-    'page': randomPage(3).toString(),
     'language': 'en-US',
-  });
+  }, { topPages: 3, deepMin: 3, deepMax: 10, topCount: 12, deepCount: 8 });
 
   return {
     genre: genre.name,
-    items: data.results.map(r => mapMovie(r)),
+    items: results.slice(0, 20).map(r => mapMovie(r)),
   };
 }
 
@@ -161,20 +184,24 @@ async function fetchCriticsPicks() {
 }
 
 async function fetchTopRated() {
-  const data = await tmdbGet('/movie/top_rated', { language: 'en-US', page: randomPage(5).toString() });
-  return data.results.map(r => mapMovie(r));
+  const results = await fetchBlended('/movie/top_rated', {
+    'language': 'en-US',
+  }, { topPages: 2, deepMin: 3, deepMax: 10, topCount: 14, deepCount: 6 });
+
+  return results.map(r => mapMovie(r)).slice(0, 20);
 }
 
 async function fetchRecommendations() {
   // Get recently watched from Jellyfin
   const seeds = await getJellyfinWatchHistory();
-  if (seeds.length === 0) return null;
+  if (seeds.length === 0) return [];
 
-  // Resolve TMDB IDs for top 5 seeds
+  // Resolve TMDB IDs for seeds
   const tmdbSeeds = [];
-  for (const seed of seeds.slice(0, 5)) {
+  for (const seed of seeds.slice(0, 20)) {
     try {
-      const data = await tmdbGet('/search/movie', {
+      const searchType = seed.type === 'Series' ? 'tv' : 'movie';
+      const data = await tmdbGet(`/search/${searchType}`, {
         query: seed.name,
         year: seed.year || '',
       });
@@ -182,7 +209,7 @@ async function fetchRecommendations() {
         tmdbSeeds.push({
           tmdbId: data.results[0].id,
           title: seed.name,
-          type: seed.type === 'Series' ? 'tv' : 'movie',
+          type: searchType,
         });
       }
     } catch (err) {
@@ -190,46 +217,44 @@ async function fetchRecommendations() {
     }
   }
 
-  if (tmdbSeeds.length === 0) return null;
+  if (tmdbSeeds.length === 0) return [];
 
-  // Fetch recommendations for each seed, deduplicate
-  const allRecs = [];
-  const seenIds = new Set();
+  // Shuffle and pick 3 diverse seeds
+  const shuffled = [...tmdbSeeds].sort(() => Math.random() - 0.5);
+  const picked = shuffled.slice(0, 3);
+  console.log(`[discover] Rec seeds: ${picked.map(s => s.title).join(', ')}`);
 
-  for (const seed of tmdbSeeds) {
+  // Fetch recommendations for each seed separately
+  const rows = [];
+  const globalSeenIds = new Set();
+
+  for (const seed of picked) {
     try {
       const endpoint = seed.type === 'tv'
         ? `/tv/${seed.tmdbId}/recommendations`
         : `/movie/${seed.tmdbId}/recommendations`;
       const data = await tmdbGet(endpoint);
 
+      const items = [];
       for (const r of data.results || []) {
-        if (!seenIds.has(r.id)) {
-          seenIds.add(r.id);
-          allRecs.push({
-            ...(seed.type === 'tv' ? mapTV(r) : mapMovie(r)),
-            seedTitle: seed.title,
-          });
+        if (!globalSeenIds.has(r.id)) {
+          globalSeenIds.add(r.id);
+          items.push(seed.type === 'tv' ? mapTV(r) : mapMovie(r));
         }
+      }
+
+      if (items.length > 0) {
+        rows.push({
+          seedTitle: seed.title,
+          items: items.slice(0, 20),
+        });
       }
     } catch (err) {
       console.error(`[discover] Recs for "${seed.title}" failed:`, err.message);
     }
   }
 
-  if (allRecs.length === 0) return null;
-
-  // Pick the seed with the most recs for the row title
-  const seedCounts = {};
-  for (const r of allRecs) {
-    seedCounts[r.seedTitle] = (seedCounts[r.seedTitle] || 0) + 1;
-  }
-  const bestSeed = Object.entries(seedCounts).sort((a, b) => b[1] - a[1])[0][0];
-
-  return {
-    seedTitle: bestSeed,
-    items: allRecs.slice(0, 20),
-  };
+  return rows;
 }
 
 // --- Jellyfin ---
@@ -363,14 +388,14 @@ async function refreshDiscover() {
 
   try {
     // Fetch all rows in parallel
-    const [trending, recent, hiddenGems, genreResult, topRated, criticsResult, recsResult] = await Promise.all([
+    const [trending, recent, hiddenGems, genreResult, topRated, criticsResult, recsRows] = await Promise.all([
       fetchTrending().catch(err => { console.error('[discover] Trending failed:', err.message); return []; }),
       fetchRecentlyAvailable().catch(err => { console.error('[discover] Recent failed:', err.message); return []; }),
       fetchHiddenGems().catch(err => { console.error('[discover] Hidden gems failed:', err.message); return []; }),
       fetchGenreGems().catch(err => { console.error('[discover] Genre gems failed:', err.message); return { genre: '?', items: [] }; }),
       fetchTopRated().catch(err => { console.error('[discover] Top rated failed:', err.message); return []; }),
       fetchCriticsPicks().catch(err => { console.error('[discover] Critics picks failed:', err.message); return { listName: '?', items: [] }; }),
-      fetchRecommendations().catch(err => { console.error('[discover] Recommendations failed:', err.message); return null; }),
+      fetchRecommendations().catch(err => { console.error('[discover] Recommendations failed:', err.message); return []; }),
     ]);
 
     // Filter out Jellyfin library items
@@ -383,18 +408,30 @@ async function refreshDiscover() {
       { name: 'top_rated', title: 'Top Rated', items: filterLibrary(topRated) },
     ];
 
-    if (recsResult && recsResult.items.length > 0) {
-      rows.splice(1, 0, {
-        name: 'recommendations',
-        title: `Because You Watched ${recsResult.seedTitle}`,
-        items: filterLibrary(recsResult.items),
-      });
+    // Insert up to 3 "Because You Watched" rows after trending
+    if (recsRows && recsRows.length > 0) {
+      const recRowsFiltered = recsRows
+        .map((r, i) => ({
+          name: `recommendations_${i}`,
+          title: `Because You Watched ${r.seedTitle}`,
+          items: filterLibrary(r.items),
+        }))
+        .filter(r => r.items.length > 0);
+      rows.splice(1, 0, ...recRowsFiltered);
     }
 
     // Enrich with OMDb ratings (only items that will be shown)
     for (const row of rows) {
       if (row.items.length > 0) {
         await enrichWithRatings(row.items);
+      }
+    }
+
+    // Clear old recommendation rows before writing new ones
+    const existing = db.getAllDiscoverRows.all();
+    for (const row of existing) {
+      if (row.row_name.startsWith('recommendations')) {
+        db.db.prepare('DELETE FROM discover_cache WHERE row_name = ?').run(row.row_name);
       }
     }
 
@@ -428,21 +465,63 @@ function getDiscoverData() {
   });
 }
 
+async function refreshRecommendations() {
+  try {
+    const recsRows = await fetchRecommendations();
+    if (recsRows.length === 0) return;
+
+    // Clear old recommendation rows
+    const existing = db.getAllDiscoverRows.all();
+    for (const row of existing) {
+      if (row.row_name.startsWith('recommendations')) {
+        db.db.prepare('DELETE FROM discover_cache WHERE row_name = ?').run(row.row_name);
+      }
+    }
+
+    let totalItems = 0;
+    for (let i = 0; i < recsRows.length; i++) {
+      const filtered = filterLibrary(recsRows[i].items);
+      if (filtered.length > 0) {
+        await enrichWithRatings(filtered);
+        db.setDiscoverRow.run({
+          rowName: `recommendations_${i}`,
+          data: JSON.stringify({
+            title: `Because You Watched ${recsRows[i].seedTitle}`,
+            items: filtered,
+          }),
+        });
+        totalItems += filtered.length;
+      }
+    }
+    console.log(`[discover] Recommendations refreshed: ${recsRows.length} rows, ${totalItems} items`);
+  } catch (err) {
+    console.error('[discover] Recommendations refresh failed:', err.message);
+  }
+}
+
 let refreshInterval = null;
+let recsInterval = null;
 
 function startRefresh(intervalMs = 6 * 60 * 60 * 1000) {
-  // Initial refresh after short delay (let Jellyfin sync finish first)
+  // Initial full refresh after short delay (let Jellyfin sync finish first)
   setTimeout(() => {
     refreshDiscover().catch(err => console.error('[discover] Initial refresh failed:', err.message));
   }, 5000);
 
+  // Full refresh every 6 hours
   refreshInterval = setInterval(() => {
     refreshDiscover().catch(err => console.error('[discover] Refresh failed:', err.message));
   }, intervalMs);
+
+  // Recommendations refresh every hour
+  recsInterval = setInterval(() => {
+    refreshRecommendations().catch(err => console.error('[discover] Recs refresh failed:', err.message));
+  }, 60 * 60 * 1000);
 }
 
 function stopRefresh() {
   if (refreshInterval) clearInterval(refreshInterval);
+  if (recsInterval) clearInterval(recsInterval);
 }
 
 module.exports = { refreshDiscover, getDiscoverData, startRefresh, stopRefresh };
