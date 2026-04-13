@@ -431,6 +431,60 @@
     return discoverData[rowIdx] ? discoverData[rowIdx].items.length : 0;
   }
 
+  // Infinite scroll: load more when near end of row
+  const loadingMore = new Set();
+
+  async function maybeLoadMore(rowIdx) {
+    const row = discoverData[rowIdx];
+    if (!row || !row.totalAvailable) return;
+    if (row.items.length >= row.totalAvailable) return; // no more
+    if (loadingMore.has(rowIdx)) return; // already loading
+
+    const currentLen = row.items.length;
+    const focusCol = discoverFocusCol;
+    if (focusCol < currentLen - 3) return; // not near the end yet
+
+    loadingMore.add(rowIdx);
+    try {
+      const res = await fetch(`/api/discover/row/${encodeURIComponent(row.name)}?offset=${currentLen}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data.items || data.items.length === 0) {
+        row.totalAvailable = currentLen; // no more
+        return;
+      }
+
+      // Append items to data
+      row.items.push(...data.items);
+
+      // Append poster cards to the DOM
+      const track = discoverRows.querySelector(`.discover-row[data-row="${rowIdx}"] .discover-row-track`);
+      if (track) {
+        for (let i = 0; i < data.items.length; i++) {
+          const item = data.items[i];
+          const colIdx = currentLen + i;
+          const ratingsHtml = posterRatingHtml(item.ratings, item.tmdbRating);
+          const div = document.createElement('div');
+          div.className = 'poster-card';
+          div.tabIndex = 0;
+          div.dataset.row = rowIdx;
+          div.dataset.col = colIdx;
+          div.innerHTML = `
+            <img src="${item.poster || ''}" alt="${escapeHtml(item.title)}" loading="lazy">
+            <div class="poster-card-title">${escapeHtml(item.title)}</div>
+            <div class="poster-card-year">${item.year || ''}</div>
+            ${ratingsHtml ? `<div class="poster-ratings">${ratingsHtml}</div>` : ''}
+          `;
+          track.appendChild(div);
+        }
+      }
+    } catch (err) {
+      console.error('Load more failed:', err);
+    } finally {
+      loadingMore.delete(rowIdx);
+    }
+  }
+
   // --- Discover: poster focus handler ---
 
   discoverRows.addEventListener('focusin', (e) => {
@@ -443,6 +497,20 @@
     updateBackdrop(row, col);
     scrollRowToFocus(row, col);
   });
+
+  // Mobile: infinite scroll on touch swipe
+  if (isMobile) {
+    discoverRows.addEventListener('scroll', (e) => {
+      const track = e.target.closest('.discover-row-track');
+      if (!track) return;
+      const rowIdx = parseInt(track.parentElement.dataset.row);
+      if (isNaN(rowIdx)) return;
+      // Near the end? (within 2 poster widths)
+      if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 250) {
+        maybeLoadMore(rowIdx);
+      }
+    }, true);
+  }
 
   // Click on poster
   discoverRows.addEventListener('click', (e) => {
@@ -725,6 +793,7 @@
       if (e.key === 'ArrowRight') {
         e.preventDefault();
         if (col < rowLen - 1) focusDiscoverPoster(row, col + 1);
+        maybeLoadMore(row);
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
         if (col > 0) focusDiscoverPoster(row, col - 1);

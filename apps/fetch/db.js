@@ -38,12 +38,56 @@ db.exec(`
     cached_at TEXT DEFAULT (datetime('now'))
   );
 
+  CREATE TABLE IF NOT EXISTS catalog (
+    tmdb_id INTEGER NOT NULL,
+    media_type TEXT NOT NULL,
+    title TEXT NOT NULL,
+    year INTEGER,
+    overview TEXT,
+    poster TEXT,
+    backdrop TEXT,
+    tmdb_rating REAL,
+    popularity REAL,
+    vote_count INTEGER,
+    genres TEXT,
+    rt_score INTEGER,
+    imdb_rating REAL,
+    metacritic INTEGER,
+    source TEXT,
+    seed_title TEXT,
+    added_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT,
+    times_shown INTEGER DEFAULT 0,
+    last_shown_at TEXT,
+    dismissed INTEGER DEFAULT 0,
+    PRIMARY KEY (tmdb_id, media_type)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_catalog_source ON catalog(source);
+  CREATE INDEX IF NOT EXISTS idx_catalog_shown ON catalog(times_shown, last_shown_at);
+  CREATE INDEX IF NOT EXISTS idx_catalog_rating ON catalog(tmdb_rating);
+
+  CREATE TABLE IF NOT EXISTS ingestion_log (
+    source TEXT PRIMARY KEY,
+    last_page INTEGER DEFAULT 0,
+    last_run TEXT,
+    total_items INTEGER DEFAULT 0
+  );
+
+  CREATE TABLE IF NOT EXISTS watchlist (
+    tmdb_id INTEGER NOT NULL,
+    media_type TEXT NOT NULL,
+    added_at TEXT DEFAULT (datetime('now')),
+    PRIMARY KEY (tmdb_id, media_type)
+  );
+
   CREATE TABLE IF NOT EXISTS library (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     jellyfin_id TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     type TEXT NOT NULL,
     year INTEGER,
+    tmdb_id INTEGER,
     synced_at TEXT DEFAULT (datetime('now'))
   );
 `);
@@ -102,6 +146,79 @@ const setRating = db.prepare(`
 
 const getRating = db.prepare(`SELECT * FROM ratings_cache WHERE title_key = @titleKey`);
 
+// Catalog
+const upsertCatalogItem = db.prepare(`
+  INSERT INTO catalog (tmdb_id, media_type, title, year, overview, poster, backdrop, tmdb_rating, popularity, vote_count, genres, source, seed_title, added_at, updated_at)
+  VALUES (@tmdbId, @mediaType, @title, @year, @overview, @poster, @backdrop, @tmdbRating, @popularity, @voteCount, @genres, @source, @seedTitle, datetime('now'), datetime('now'))
+  ON CONFLICT(tmdb_id, media_type) DO UPDATE SET
+    title = @title,
+    overview = COALESCE(@overview, catalog.overview),
+    poster = COALESCE(@poster, catalog.poster),
+    backdrop = COALESCE(@backdrop, catalog.backdrop),
+    tmdb_rating = COALESCE(@tmdbRating, catalog.tmdb_rating),
+    popularity = COALESCE(@popularity, catalog.popularity),
+    vote_count = COALESCE(@voteCount, catalog.vote_count),
+    genres = COALESCE(@genres, catalog.genres),
+    source = CASE
+      WHEN catalog.source NOT LIKE '%' || @source || '%' THEN catalog.source || ',' || @source
+      ELSE catalog.source
+    END,
+    seed_title = CASE
+      WHEN @seedTitle IS NOT NULL AND (catalog.seed_title IS NULL OR catalog.seed_title NOT LIKE '%' || @seedTitle || '%')
+      THEN COALESCE(catalog.seed_title || ',' || @seedTitle, @seedTitle)
+      ELSE catalog.seed_title
+    END,
+    updated_at = datetime('now')
+`);
+
+const updateCatalogRatings = db.prepare(`
+  UPDATE catalog SET rt_score = @rtScore, imdb_rating = @imdbRating, metacritic = @metacritic, updated_at = datetime('now')
+  WHERE tmdb_id = @tmdbId AND media_type = @mediaType
+`);
+
+const getCatalogItem = db.prepare(`SELECT * FROM catalog WHERE tmdb_id = @tmdbId AND media_type = @mediaType`);
+
+const getCatalogSize = db.prepare(`SELECT COUNT(*) as count FROM catalog`);
+
+const markShown = db.prepare(`
+  UPDATE catalog SET times_shown = times_shown + 1, last_shown_at = datetime('now')
+  WHERE tmdb_id = @tmdbId AND media_type = @mediaType
+`);
+
+const dismissItem = db.prepare(`UPDATE catalog SET dismissed = 1 WHERE tmdb_id = @tmdbId AND media_type = @mediaType`);
+
+const getItemsNeedingRatings = db.prepare(`
+  SELECT tmdb_id, media_type, title, year FROM catalog
+  WHERE rt_score IS NULL AND imdb_rating IS NULL
+  ORDER BY added_at DESC LIMIT @limit
+`);
+
+const getDistinctSeeds = db.prepare(`
+  SELECT DISTINCT seed_title FROM catalog
+  WHERE seed_title IS NOT NULL AND seed_title != ''
+  ORDER BY added_at DESC
+`);
+
+// Ingestion log
+const getIngestionLog = db.prepare(`SELECT * FROM ingestion_log WHERE source = @source`);
+
+const upsertIngestionLog = db.prepare(`
+  INSERT INTO ingestion_log (source, last_page, last_run, total_items)
+  VALUES (@source, @lastPage, datetime('now'), @totalItems)
+  ON CONFLICT(source) DO UPDATE SET
+    last_page = @lastPage, last_run = datetime('now'), total_items = ingestion_log.total_items + @totalItems
+`);
+
+// Watchlist
+const addToWatchlist = db.prepare(`INSERT OR IGNORE INTO watchlist (tmdb_id, media_type) VALUES (@tmdbId, @mediaType)`);
+const removeFromWatchlist = db.prepare(`DELETE FROM watchlist WHERE tmdb_id = @tmdbId AND media_type = @mediaType`);
+const getWatchlist = db.prepare(`SELECT * FROM watchlist ORDER BY added_at DESC`);
+const isInWatchlist = db.prepare(`SELECT 1 FROM watchlist WHERE tmdb_id = @tmdbId AND media_type = @mediaType`);
+
+// Library with TMDB ID
+const updateLibraryTmdbId = db.prepare(`UPDATE library SET tmdb_id = @tmdbId WHERE jellyfin_id = @jellyfinId`);
+const getLibraryTmdbIds = db.prepare(`SELECT tmdb_id, type FROM library WHERE tmdb_id IS NOT NULL`);
+
 module.exports = {
   db,
   insertDownload,
@@ -121,4 +238,20 @@ module.exports = {
   getAllDiscoverRows,
   setRating,
   getRating,
+  upsertCatalogItem,
+  updateCatalogRatings,
+  getCatalogItem,
+  getCatalogSize,
+  markShown,
+  dismissItem,
+  getItemsNeedingRatings,
+  getDistinctSeeds,
+  getIngestionLog,
+  upsertIngestionLog,
+  addToWatchlist,
+  removeFromWatchlist,
+  getWatchlist,
+  isInWatchlist,
+  updateLibraryTmdbId,
+  getLibraryTmdbIds,
 };

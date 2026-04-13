@@ -6,6 +6,7 @@ const { search } = require('./search');
 const jellyfin = require('./jellyfin');
 const { addPosters } = require('./tmdb');
 const discover = require('./discover');
+const ingest = require('./ingest');
 
 const app = express();
 const PORT = process.env.FETCH_PORT || 8881;
@@ -127,14 +128,16 @@ app.get('/api/downloads', async (req, res) => {
       }
     }
 
-    const result = downloads.map(d => ({
+    // Re-read from DB after updates so response reflects current state
+    const fresh = db.getDownloads.all();
+    const result = fresh.map(d => ({
       id: d.id,
       name: d.name,
       resolution: d.resolution,
       source: d.source,
       type: d.type,
       episode: d.episode,
-      status: d.status === 'downloading' && progressMap[d.id]?.percentDone >= 1 ? 'complete' : d.status,
+      status: d.status,
       addedAt: d.added_at,
       completedAt: d.completed_at,
       progress: progressMap[d.id] || null,
@@ -166,7 +169,7 @@ app.delete('/api/downloads/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
-// Discover rows (cached)
+// Discover rows (from catalog)
 app.get('/api/discover', (req, res) => {
   try {
     const rows = discover.getDiscoverData();
@@ -175,6 +178,58 @@ app.get('/api/discover', (req, res) => {
     console.error('[discover] Error:', err.message);
     res.status(500).json({ error: 'Failed to fetch discover data' });
   }
+});
+
+// Infinite scroll: load more items for a specific row
+app.get('/api/discover/row/:name', (req, res) => {
+  try {
+    const offset = parseInt(req.query.offset) || 0;
+    const rows = discover.getDiscoverData({ rowName: req.params.name, offset, limit: 20 });
+    res.json(rows[0] || { name: req.params.name, title: '', items: [], totalAvailable: 0 });
+  } catch (err) {
+    console.error('[discover/row] Error:', err.message);
+    res.status(500).json({ error: 'Failed' });
+  }
+});
+
+// Dismiss item from discover
+app.post('/api/discover/dismiss/:tmdbId', (req, res) => {
+  const tmdbId = parseInt(req.params.tmdbId);
+  const mediaType = req.query.type || 'movie';
+  db.dismissItem.run({ tmdbId, mediaType });
+  res.json({ ok: true });
+});
+
+// Watchlist
+app.get('/api/watchlist', (req, res) => {
+  const items = db.getWatchlist.all();
+  const result = items.map(w => {
+    const cat = db.getCatalogItem.get({ tmdbId: w.tmdb_id, mediaType: w.media_type });
+    return cat ? {
+      tmdbId: cat.tmdb_id,
+      mediaType: cat.media_type,
+      title: cat.title,
+      year: cat.year,
+      poster: cat.poster,
+      backdrop: cat.backdrop,
+      tmdbRating: cat.tmdb_rating,
+      addedAt: w.added_at,
+    } : null;
+  }).filter(Boolean);
+  res.json(result);
+});
+
+app.post('/api/watchlist', (req, res) => {
+  const { tmdbId, mediaType } = req.body;
+  db.addToWatchlist.run({ tmdbId, mediaType: mediaType || 'movie' });
+  res.json({ ok: true });
+});
+
+app.delete('/api/watchlist/:tmdbId', (req, res) => {
+  const tmdbId = parseInt(req.params.tmdbId);
+  const mediaType = req.query.type || 'movie';
+  db.removeFromWatchlist.run({ tmdbId, mediaType });
+  res.json({ ok: true });
 });
 
 // Discover item: search for best torrent for a TMDB item
@@ -256,5 +311,5 @@ app.get('/api/discover/item/:tmdbId', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`[fetch] Server running on http://localhost:${PORT}`);
   jellyfin.startSync();
-  discover.startRefresh();
+  ingest.startIngestion();
 });
